@@ -3,4 +3,4 @@
 //   export * from "./access";
 //   export * from "./course";
 
-export {};
+export * from "./access";
