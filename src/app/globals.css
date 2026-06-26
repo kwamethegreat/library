@@ -1,15 +1,21 @@
 @import "tailwindcss";
 
-/* Dark-theme design tokens — the app is dark-first, so these are the
-   default in :root. (Step 1.8 / step 27 shadcn init may restructure
-   these into a :root + .dark split — see note below.) */
+/* Class-based dark mode: `dark:` utilities key off a `.dark` class on
+   <html> instead of the OS preference. (v4 replaces v3's darkMode: 'class'.) */
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* Dark-theme design tokens - the app is dark-first, so these are the
+   default in :root. (Step 27 shadcn init may restructure these into a
+   :root + .dark split - see note below.) */
 :root {
+  color-scheme: dark; /* dark-render scrollbars, form controls, etc. */
+
   /* --- Spec palette --- */
-  --background: #090d16; /* darkest — page background */
+  --background: #090d16; /* darkest - page background */
   --surface: #121824; /* cards, panels, raised surfaces */
   --border: #242f41; /* borders, dividers, edges */
-  --accent: #38bdf8; /* primary accent — sky */
-  --success: #4ade80; /* success — green */
+  --accent: #38bdf8; /* primary accent - sky */
+  --success: #4ade80; /* success - green */
 
   /* --- Semantic --- */
   --foreground: #f1f5f9; /* primary text */
@@ -32,10 +38,28 @@
 
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+
+  /* Base spacing unit - v4 generates the full scale (p-1, gap-4, ...) from
+     this. 0.25rem is the v4 default; declared to make the scale intentional. */
+  --spacing: 0.25rem;
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
   font-family: var(--font-sans), system-ui, sans-serif;
+  line-height: 1.6;
+}
+
+/* Base typography */
+@layer base {
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    line-height: 1.2;
+    text-wrap: balance;
+  }
 }
