@@ -1,0 +1,16 @@
+# EditorConfig - https://editorconfig.org
+# Top-most EditorConfig file; stops the upward search here.
+root = true
+
+# Defaults for all files
+[*]
+charset = utf-8
+end_of_line = lf
+insert_final_newline = true
+trim_trailing_whitespace = true
+indent_style = space
+indent_size = 2
+
+# Markdown: trailing whitespace can be meaningful (two trailing spaces = hard line break)
+[*.md]
+trim_trailing_whitespace = false
