@@ -1,26 +1,41 @@
 @import "tailwindcss";
 
+/* Dark-theme design tokens — the app is dark-first, so these are the
+   default in :root. (Step 1.8 / step 27 shadcn init may restructure
+   these into a :root + .dark split — see note below.) */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* --- Spec palette --- */
+  --background: #090d16; /* darkest — page background */
+  --surface: #121824; /* cards, panels, raised surfaces */
+  --border: #242f41; /* borders, dividers, edges */
+  --accent: #38bdf8; /* primary accent — sky */
+  --success: #4ade80; /* success — green */
+
+  /* --- Semantic --- */
+  --foreground: #f1f5f9; /* primary text */
+  --muted: #1b2334; /* muted/subtle surface */
+  --muted-foreground: #94a3b8; /* secondary / muted text */
 }
 
+/* Map raw variables to Tailwind color utilities.
+   @theme inline makes each available as bg-*, text-*, border-* classes
+   and as a real CSS variable (var(--color-background), etc.). */
 @theme inline {
   --color-background: var(--background);
+  --color-surface: var(--surface);
+  --color-border: var(--border);
+  --color-accent: var(--accent);
+  --color-success: var(--success);
   --color-foreground: var(--foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-sans), system-ui, sans-serif;
 }
