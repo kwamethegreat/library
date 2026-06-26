@@ -1,24 +1,13 @@
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
-import type { UserTier, AccessLevel, UserRole } from "@/types";
+"use client";
 
-const tier: UserTier = "paid";       // valid
-const level: AccessLevel = "free";   // valid
-const role: UserRole = "admin";      // valid
+import { toast } from "sonner";
+
+import { Button } from "@/components/ui/button";
+
 export default function Home() {
   return (
-    <div className="p-8 space-y-4">
-      <Card>
-        <CardHeader>
-          <CardTitle>Components work</CardTitle>
-        </CardHeader>
-        <CardContent className="space-x-2">
-          <Button>Primary</Button>
-          <Button variant="secondary">Secondary</Button>
-          <Badge>Badge</Badge>
-        </CardContent>
-      </Card>
+    <div className="p-8">
+      <Button onClick={() => toast.success("Toast works")}>Show toast</Button>
     </div>
   );
 }
