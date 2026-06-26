@@ -1,10 +1,12 @@
+import { Footer } from "@/components/layout/Footer";
 import { Navigation } from "@/components/layout/Navigation";
 
 export default function Home() {
   return (
     <>
       <Navigation />
-      <main className="p-8">Home content placeholder</main>
+      <main className="flex-1 p-8">Short content</main>
+      <Footer />
     </>
   );
 }
