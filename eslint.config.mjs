@@ -2,6 +2,7 @@ import { fileURLToPath } from "node:url";
 import { dirname } from "node:path";
 import nextPlugin from "@next/eslint-plugin-next";
 import tseslint from "typescript-eslint";
+import importPlugin from "eslint-plugin-import";
 import eslintConfigPrettier from "eslint-config-prettier/flat";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -37,6 +38,33 @@ export default tseslint.config(
     },
     rules: {
       "@typescript-eslint/no-floating-promises": "error",
+    },
+  },
+
+  // Import resolution (understands @/ aliases) + import ordering  [0.15]
+  {
+    files: ["**/*.ts", "**/*.tsx"],
+    plugins: {
+      import: importPlugin,
+    },
+    settings: {
+      "import/resolver": {
+        typescript: {
+          alwaysTryTypes: true,
+          project: "./tsconfig.json",
+        },
+      },
+    },
+    rules: {
+      "import/order": [
+        "error",
+        {
+          groups: ["builtin", "external", "internal", "parent", "sibling", "index"],
+          pathGroups: [{ pattern: "@/**", group: "internal", position: "after" }],
+          "newlines-between": "always",
+          alphabetize: { order: "asc", caseInsensitive: true },
+        },
+      ],
     },
   },
 
