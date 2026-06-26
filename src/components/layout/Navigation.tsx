@@ -3,7 +3,6 @@ import Link from "next/link";
 import { Container } from "@/components/layout/Container";
 import { buttonVariants } from "@/components/ui/button";
 
-
 interface NavigationProps {
   /**
    * Auth-aware CTA state. Defaults to logged-out. Once Supabase auth is wired

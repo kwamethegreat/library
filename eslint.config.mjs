@@ -59,8 +59,17 @@ export default tseslint.config(
       "import/order": [
         "error",
         {
-          groups: ["builtin", "external", "internal", "parent", "sibling", "index"],
-          pathGroups: [{ pattern: "@/**", group: "internal", position: "after" }],
+          groups: [
+            "builtin",
+            "external",
+            "internal",
+            "parent",
+            "sibling",
+            "index",
+          ],
+          pathGroups: [
+            { pattern: "@/**", group: "internal", position: "after" },
+          ],
           "newlines-between": "always",
           alphabetize: { order: "asc", caseInsensitive: true },
         },

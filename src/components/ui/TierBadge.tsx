@@ -30,10 +30,7 @@ export function TierBadge({ tier, className }: TierBadgeProps) {
   const config = tierConfig[tier];
 
   return (
-    <Badge
-      variant="outline"
-      className={cn(config.className, className)}
-    >
+    <Badge variant="outline" className={cn(config.className, className)}>
       {config.label}
     </Badge>
   );
