@@ -1,13 +1,10 @@
-"use client";
-
-import { toast } from "sonner";
-
-import { Button } from "@/components/ui/button";
+import { Navigation } from "@/components/layout/Navigation";
 
 export default function Home() {
   return (
-    <div className="p-8">
-      <Button onClick={() => toast.success("Toast works")}>Show toast</Button>
-    </div>
+    <>
+      <Navigation />
+      <main className="p-8">Home content placeholder</main>
+    </>
   );
 }
