@@ -1,58 +1,166 @@
 @import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
 
 /* Class-based dark mode: `dark:` utilities key off a `.dark` class on
    <html> instead of the OS preference. (v4 replaces v3's darkMode: 'class'.) */
 @custom-variant dark (&:where(.dark, .dark *));
 
-/* Dark-theme design tokens - the app is dark-first, so these are the
-   default in :root. (Step 27 shadcn init may restructure these into a
-   :root + .dark split - see note below.) */
+/* Light fallback (shadcn defaults). The app is dark-first via class="dark"
+   on <html>, so the .dark block below is what actually renders. */
 :root {
-  color-scheme: dark; /* dark-render scrollbars, form controls, etc. */
+  --surface: #ffffff;
+  --success: #16a34a;
+
+  --radius: 0.625rem;
+  --background: oklch(1 0 0);
+  --foreground: oklch(0.145 0 0);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.145 0 0);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.145 0 0);
+  --primary: oklch(0.205 0 0);
+  --primary-foreground: oklch(0.985 0 0);
+  --secondary: oklch(0.97 0 0);
+  --secondary-foreground: oklch(0.205 0 0);
+  --muted: oklch(0.97 0 0);
+  --muted-foreground: oklch(0.556 0 0);
+  --accent: oklch(0.97 0 0);
+  --accent-foreground: oklch(0.205 0 0);
+  --destructive: oklch(0.577 0.245 27.325);
+  --border: oklch(0.922 0 0);
+  --input: oklch(0.922 0 0);
+  --ring: oklch(0.708 0 0);
+  --chart-1: oklch(0.87 0 0);
+  --chart-2: oklch(0.556 0 0);
+  --chart-3: oklch(0.439 0 0);
+  --chart-4: oklch(0.371 0 0);
+  --chart-5: oklch(0.269 0 0);
+  --sidebar: oklch(0.985 0 0);
+  --sidebar-foreground: oklch(0.145 0 0);
+  --sidebar-primary: oklch(0.205 0 0);
+  --sidebar-primary-foreground: oklch(0.985 0 0);
+  --sidebar-accent: oklch(0.97 0 0);
+  --sidebar-accent-foreground: oklch(0.205 0 0);
+  --sidebar-border: oklch(0.922 0 0);
+  --sidebar-ring: oklch(0.708 0 0);
+}
+
+/* Dark theme — YOUR SPEC PALETTE. This is the active theme (class="dark"). */
+.dark {
+  color-scheme: dark;
 
   /* --- Spec palette --- */
   --background: #090d16; /* darkest - page background */
-  --surface: #121824; /* cards, panels, raised surfaces */
+  --foreground: #f1f5f9; /* primary text */
   --border: #242f41; /* borders, dividers, edges */
   --accent: #38bdf8; /* primary accent - sky */
+  --accent-foreground: #090d16; /* text on accent */
   --success: #4ade80; /* success - green */
 
-  /* --- Semantic --- */
-  --foreground: #f1f5f9; /* primary text */
+  /* --- Surfaces mapped to shadcn token names --- */
+  --surface: #121824; /* cards, panels, raised surfaces */
+  --card: #121824;
+  --card-foreground: #f1f5f9;
+  --popover: #121824;
+  --popover-foreground: #f1f5f9;
+
+  /* --- Primary = your sky accent --- */
+  --primary: #38bdf8;
+  --primary-foreground: #090d16;
+  --secondary: #1b2334;
+  --secondary-foreground: #f1f5f9;
+
+  /* --- Muted --- */
   --muted: #1b2334; /* muted/subtle surface */
   --muted-foreground: #94a3b8; /* secondary / muted text */
+
+  /* --- shadcn essentials kept from its dark defaults --- */
+  --destructive: oklch(0.704 0.191 22.216);
+  --input: oklch(1 0 0 / 15%);
+  --ring: #38bdf8;
+  --radius: 0.625rem;
+
+  --chart-1: #38bdf8;
+  --chart-2: #4ade80;
+  --chart-3: oklch(0.439 0 0);
+  --chart-4: oklch(0.371 0 0);
+  --chart-5: oklch(0.269 0 0);
+
+  --sidebar: #121824;
+  --sidebar-foreground: #f1f5f9;
+  --sidebar-primary: #38bdf8;
+  --sidebar-primary-foreground: #090d16;
+  --sidebar-accent: #1b2334;
+  --sidebar-accent-foreground: #f1f5f9;
+  --sidebar-border: #242f41;
+  --sidebar-ring: #38bdf8;
 }
 
-/* Map raw variables to Tailwind color utilities.
-   @theme inline makes each available as bg-*, text-*, border-* classes
-   and as a real CSS variable (var(--color-background), etc.). */
+/* Map raw variables to Tailwind color utilities. */
 @theme inline {
   --color-background: var(--background);
+  --color-foreground: var(--foreground);
   --color-surface: var(--surface);
   --color-border: var(--border);
   --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
   --color-success: var(--success);
-  --color-foreground: var(--foreground);
   --color-muted: var(--muted);
   --color-muted-foreground: var(--muted-foreground);
 
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-destructive: var(--destructive);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+  --font-heading: var(--font-geist-sans);
 
-  /* Base spacing unit - v4 generates the full scale (p-1, gap-4, ...) from
-     this. 0.25rem is the v4 default; declared to make the scale intentional. */
   --spacing: 0.25rem;
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+  --radius-2xl: calc(var(--radius) * 1.8);
+  --radius-3xl: calc(var(--radius) * 2.2);
+  --radius-4xl: calc(var(--radius) * 2.6);
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: var(--font-sans), system-ui, sans-serif;
-  line-height: 1.6;
-}
-
-/* Base typography */
 @layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+    line-height: 1.6;
+  }
+  html {
+    @apply font-sans;
+  }
   h1,
   h2,
   h3,
