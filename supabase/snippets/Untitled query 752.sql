@@ -1,2 +1,2 @@
-insert into public.user_progress (user_id, lesson_id, status, completed_at)
-values (gen_random_uuid(), gen_random_uuid(), 'completed', null);
+insert into public.user_preferences (user_id)
+values (gen_random_uuid());
