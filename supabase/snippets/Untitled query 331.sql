@@ -1,3 +1,2 @@
-delete from public.courses where slug = 'intro-to-react';
-select count(*) from public.modules
-where course_id not in (select id from public.courses);
+insert into public.lessons (module_id, slug, title, access_level)
+values ((select id from public.modules where slug='getting-started'), 'bad', 'Bad', 'premium');

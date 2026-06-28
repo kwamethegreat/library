@@ -1,5 +1,5 @@
-insert into public.courses (track_id, slug, title)
+insert into public.lessons (module_id, slug, title, access_level, body_markdown)
 values (
-  (select id from public.tracks where slug = 'frontend-development'),
-  'intro-to-vue', 'Intro to Vue'
+  (select id from public.modules where slug='getting-started'),
+  'what-is-react', 'What is React?', 'free', '# Welcome\n\nReact is...'
 );
