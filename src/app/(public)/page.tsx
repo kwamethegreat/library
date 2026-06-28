@@ -14,7 +14,7 @@ import {
 
 const features = [
   {
-    title: "Structured Courses",
+    title: "Angel",
     description: "Learn through guided, progressive course content.",
   },
   {
