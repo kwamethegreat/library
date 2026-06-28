@@ -1,1 +1,8 @@
-select event_type, target_type, metadata, created_at from public.audit_events;
+select
+  event_object_table as table_name,
+  trigger_name,
+  action_timing,
+  event_manipulation
+from information_schema.triggers
+where trigger_schema = 'public'
+order by event_object_table;
