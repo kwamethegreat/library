@@ -1,4 +1,2 @@
-insert into public.subscriptions
-  (user_id, stripe_customer_id, stripe_subscription_id, status)
-values
-  (gen_random_uuid(), 'cus_test', 'sub_test', 'fake_status');
+insert into public.user_progress (user_id, lesson_id, status, completed_at)
+values (gen_random_uuid(), gen_random_uuid(), 'completed', null);

@@ -1,2 +1,2 @@
-insert into public.courses (track_id, slug, title)
-values ((select id from public.tracks where slug='frontend-development'), 'intro-to-react', 'Intro to React');
+insert into public.user_progress (user_id, lesson_id, status)
+values (gen_random_uuid(), gen_random_uuid(), 'in_progress');
