@@ -1,5 +1,5 @@
-insert into public.courses (track_id, slug, title, access_level)
+insert into public.modules (course_id, slug, title)
 values (
-  (select id from public.tracks where slug = 'frontend-development'),
-  'bad-course', 'Bad Course', 'premium'
+  (select id from public.courses where slug = 'intro-to-react'),
+  'getting-started', 'Getting Started'
 );
