@@ -1,2 +1,1 @@
-insert into public.user_progress (user_id, lesson_id, status)
-values (gen_random_uuid(), gen_random_uuid(), 'in_progress');
+select event_type, target_type, metadata, created_at from public.audit_events;
