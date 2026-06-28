@@ -1,2 +1,2 @@
-insert into public.profiles (id, role)
-values (gen_random_uuid(), 'superadmin');
+insert into public.tracks (slug, title)
+values ('frontend-development', 'Frontend Development');
