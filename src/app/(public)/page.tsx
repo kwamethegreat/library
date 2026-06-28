@@ -14,7 +14,7 @@ import {
 
 const features = [
   {
-    title: "Angel",
+    title: "Zazi is really awesome!",
     description: "Learn through guided, progressive course content.",
   },
   {
