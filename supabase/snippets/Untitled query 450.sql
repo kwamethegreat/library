@@ -1,2 +1,2 @@
-insert into public.lessons (module_id, slug, title, video_provider, video_asset_id)
-values ((select id from public.modules where slug='getting-started'), 'vid', 'Vid', 'dailymotion', 'abc');
+insert into public.assets (lesson_id, title, storage_path, access_level)
+values ((select id from public.lessons where slug='what-is-react'), 'Bad', 'x/y.pdf', 'premium');

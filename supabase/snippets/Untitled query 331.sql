@@ -1,2 +1,5 @@
-insert into public.lessons (module_id, slug, title, access_level)
-values ((select id from public.modules where slug='getting-started'), 'bad', 'Bad', 'premium');
+insert into public.assets (lesson_id, asset_type, title, storage_path, access_level)
+values (
+  (select id from public.lessons where slug='what-is-react'),
+  'pdf', 'Lesson Slides', 'lesson-assets/what-is-react/slides.pdf', 'free'
+);
