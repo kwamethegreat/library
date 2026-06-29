@@ -1,1 +1,1 @@
-select slug, access_level from public.code_assets;
+select event_type from public.audit_events;

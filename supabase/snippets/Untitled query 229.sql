@@ -1,4 +1,4 @@
 set local role authenticated;
-set local request.jwt.claims = '{"sub": "55bce155-93a9-4423-84ea-c9ddbaf7b634", "role": "authenticated"}';
+set local request.jwt.claims = '{"sub": "00000000-0000-0000-0000-000000000000", "role": "authenticated"}';
 
-select slug, access_level from public.code_assets;
+insert into public.audit_events (event_type) values ('hack.attempt');
