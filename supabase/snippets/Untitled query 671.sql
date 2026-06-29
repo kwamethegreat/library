@@ -1,2 +1,2 @@
-insert into public.tracks (slug, title, published)
-values ('hack-attempt', 'Should Fail', true);
+set local role authenticated;
+set local request.jwt.claims = '{"sub": "922d2e76-d39d-4583-b42f-a8c065a8a30f", "role": "authenticated"}';
