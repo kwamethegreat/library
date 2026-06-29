@@ -1,1 +1,4 @@
-select event_type, target_type from public.audit_events;
+select tablename, rowsecurity
+from pg_tables
+where schemaname = 'public'
+order by tablename;

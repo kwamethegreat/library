@@ -1,6 +1,15 @@
 // Barrel file for shared application types.
-// Re-export shared types from this directory here as they are created, e.g.:
-//   export * from "./access";
-//   export * from "./course";
 
+// App-specific union types (AccessLevel, UserTier, UserRole).
 export * from "./access";
+
+// Re-export the type helpers the Supabase CLI generates in database.ts,
+// so the rest of the app can import them from "@/types".
+// (Tables<"profiles">, TablesInsert<"course">, TablesUpdate<...>, Enums<...>)
+export type {
+  Database,
+  Tables,
+  TablesInsert,
+  TablesUpdate,
+  Enums,
+} from "./database";

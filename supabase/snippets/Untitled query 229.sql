@@ -1,4 +1,4 @@
-set local role authenticated;
-set local request.jwt.claims = '{"sub": "00000000-0000-0000-0000-000000000000", "role": "authenticated"}';
-
-insert into public.audit_events (event_type) values ('hack.attempt');
+select event_object_table, trigger_name
+from information_schema.triggers
+where trigger_schema = 'public'
+order by event_object_table;

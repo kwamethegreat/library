@@ -1,5 +1,6 @@
 import { fileURLToPath } from "node:url";
 import { dirname } from "node:path";
+
 import nextPlugin from "@next/eslint-plugin-next";
 import tseslint from "typescript-eslint";
 import importPlugin from "eslint-plugin-import";
@@ -8,14 +9,17 @@ import eslintConfigPrettier from "eslint-config-prettier/flat";
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
 export default tseslint.config(
-  // Don't lint build output or the legacy Vite app
+  // Don't lint build output, the legacy Vite app, or generated files
   {
-    ignores: [".next/**", "vite-frontend/**", "node_modules/**"],
+    ignores: [
+      ".next/**",
+      "vite-frontend/**",
+      "node_modules/**",
+      "src/types/database.ts", // Supabase-generated; regenerated via `npm run db:types`
+    ],
   },
-
   // typescript-eslint, type-aware
   ...tseslint.configs.recommendedTypeChecked,
-
   // Next.js plugin rules (recommended + core-web-vitals), registered manually
   {
     plugins: {
@@ -26,7 +30,6 @@ export default tseslint.config(
       ...nextPlugin.configs["core-web-vitals"].rules,
     },
   },
-
   // Enable type-aware linting + the required rule on TS files
   {
     files: ["**/*.ts", "**/*.tsx"],
@@ -40,7 +43,6 @@ export default tseslint.config(
       "@typescript-eslint/no-floating-promises": "error",
     },
   },
-
   // Import resolution (understands @/ aliases) + import ordering  [0.15]
   {
     files: ["**/*.ts", "**/*.tsx"],
@@ -76,13 +78,11 @@ export default tseslint.config(
       ],
     },
   },
-
   // Turn off type-aware rules on plain JS / config files
   {
     files: ["**/*.js", "**/*.mjs", "**/*.cjs"],
     ...tseslint.configs.disableTypeChecked,
   },
-
   // MUST be last: disables ESLint rules that conflict with Prettier
   eslintConfigPrettier,
 );
