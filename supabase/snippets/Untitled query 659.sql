@@ -1,0 +1,1 @@
+select id, slug from public.lessons where slug = 'l1';

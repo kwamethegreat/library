@@ -1,4 +1,5 @@
 set local role authenticated;
-set local request.jwt.claims = '{"sub": "cc864855-1399-478f-a77c-9a603fc84fc0", "role": "authenticated"}';
+set local request.jwt.claims = '{"sub": "<USER_A_ID>", "role": "authenticated"}';
 
-select stripe_subscription_id, status from public.subscriptions;
+insert into public.user_progress (user_id, lesson_id, status)
+values ('<USER_A_ID>', (select id from public.lessons where slug='l1'), 'started');
