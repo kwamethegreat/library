@@ -1,1 +1,1 @@
-select id, slug from public.lessons where slug = 'l1';
+select title, access_level from public.assets;

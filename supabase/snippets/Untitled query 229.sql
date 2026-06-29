@@ -1,9 +1,4 @@
 set local role authenticated;
-set local request.jwt.claims = '{"sub": "f368b654-a59f-4a8d-9373-a00bf37a4fcf", "role": "authenticated"}';
+set local request.jwt.claims = '{"sub": "55bce155-93a9-4423-84ea-c9ddbaf7b634", "role": "authenticated"}';
 
-insert into public.user_progress (user_id, lesson_id, status)
-values (
-  'f368b654-a59f-4a8d-9373-a00bf37a4fcf',
-  'e08466b8-d626-4c6a-a9fa-960b424055cb',
-  'started'
-);
+select slug, access_level from public.code_assets;
