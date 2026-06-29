@@ -1,0 +1,1 @@
+Admin access: Admins receive no client-side RLS escalation. Privileged reads go through requireAdmin() (lib/auth/requireAdmin.ts), which verifies the caller's admin role via the RLS-respecting server client, then escalates to the service-role client server-side. Never add an RLS policy granting admins broad access based on a client-evaluated role.
