@@ -1,1 +1,1 @@
-select * from public.tracks;
+select slug, published from public.tracks;

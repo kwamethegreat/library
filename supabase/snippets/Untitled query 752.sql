@@ -1,4 +1,2 @@
-select tablename, rowsecurity
-from pg_tables
-where schemaname = 'public'
-order by tablename;
+insert into public.tracks (slug, title, published) values ('published-track', 'Published Track', true);
+insert into public.tracks (slug, title, published) values ('draft-track', 'Draft Track', false);
