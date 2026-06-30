@@ -3,12 +3,17 @@ import { NextResponse, type NextRequest } from "next/server";
 
 import { clientEnv } from "@/lib/env";
 
+// Route prefixes that require an authenticated user.
+const PROTECTED_PREFIXES = ["/dashboard", "/admin"];
+
 /**
- * Refreshes the Supabase auth session on each request and syncs the updated
- * session cookie onto the response. Server Components can't write cookies, so
- * this middleware is what actually persists refreshed tokens.
+ * Refreshes the Supabase auth session on each request AND guards protected
+ * routes: unauthenticated requests to /dashboard or /admin are redirected to
+ * /login (preserving the intended destination).
  *
- * Route-guarding for /dashboard and /admin is added later (step 77).
+ * This is a first-layer UX guard. Page-level requireUser()/requireAdmin() and
+ * RLS are the real enforcement. Admin ROLE authorization is checked at the
+ * page, not here (it requires a DB query we don't want on every edge request).
  */
 export async function updateSession(request: NextRequest) {
   let supabaseResponse = NextResponse.next({ request });
@@ -35,9 +40,26 @@ export async function updateSession(request: NextRequest) {
   );
 
   // IMPORTANT: Do not run any code between createServerClient and getUser().
-  // getUser() is what triggers the token refresh; inserting logic here can
-  // cause intermittent, hard-to-debug session loss.
-  await supabase.auth.getUser();
+  // getUser() triggers the token refresh; inserting logic here can cause
+  // intermittent, hard-to-debug session loss.
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
 
+  // Route guarding: send unauthenticated users on protected routes to /login,
+  // preserving where they were headed via ?redirectTo=.
+  const path = request.nextUrl.pathname;
+  const isProtected = PROTECTED_PREFIXES.some((prefix) =>
+    path.startsWith(prefix),
+  );
+
+  if (isProtected && !user) {
+    const url = request.nextUrl.clone();
+    url.pathname = "/login";
+    url.searchParams.set("redirectTo", path);
+    return NextResponse.redirect(url);
+  }
+
+  // IMPORTANT: return supabaseResponse so refreshed session cookies persist.
   return supabaseResponse;
 }
