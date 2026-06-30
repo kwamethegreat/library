@@ -1,4 +1,1 @@
-select tablename, policyname, cmd
-from pg_policies
-where schemaname = 'public'
-order by tablename, policyname;
+select slug, access_level, is_public_preview, published from public.lessons order by slug;

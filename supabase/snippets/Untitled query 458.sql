@@ -1,4 +1,1 @@
-select tablename, rowsecurity
-from pg_tables
-where schemaname = 'public'
-order by tablename;
+select slug, access_level, published from public.courses order by slug;
