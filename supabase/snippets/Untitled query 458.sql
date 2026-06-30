@@ -1,1 +1,1 @@
-select slug, access_level, published from public.courses order by slug;
+select email, email_confirmed_at from auth.users order by created_at desc limit 1;

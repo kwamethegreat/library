@@ -1,1 +1,1 @@
-select slug, access_level, is_public_preview, published from public.lessons order by slug;
+select display_name, role, tier from public.profiles order by created_at desc limit 1;
