@@ -1,4 +1,3 @@
-select 'tracks' as t, count(*) from public.tracks
-union all select 'courses', count(*) from public.courses
-union all select 'modules', count(*) from public.modules
-union all select 'lessons', count(*) from public.lessons;
+select email, onboarding_lane from public.profiles p
+join auth.users u on u.id = p.id
+order by u.created_at desc limit 3;
