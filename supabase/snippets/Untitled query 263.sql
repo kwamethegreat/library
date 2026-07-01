@@ -1,1 +1,2 @@
-select display_name, role, tier from public.profiles order by created_at desc limit 1;
+-- As postgres, check there's an active session for that user.
+select count(*) from auth.sessions;
