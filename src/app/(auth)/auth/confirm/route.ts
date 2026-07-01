@@ -1,13 +1,14 @@
 import { redirect } from "next/navigation";
 import { type NextRequest } from "next/server";
 
+import { getPostAuthDestination } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 
 /**
  * Email confirmation / recovery callback.
  * The link in the confirmation email points here with token_hash + type.
  * We verify the OTP (which sets the session cookie via the SSR client), then
- * redirect onward. Used for signup confirmation AND password recovery.
+ * route the user onward. Used for signup confirmation AND password recovery.
  */
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
@@ -16,7 +17,7 @@ export async function GET(request: NextRequest) {
 
   // Only allow internal (path) redirects to avoid open-redirect abuse.
   const nextParam = searchParams.get("next");
-  const next = nextParam?.startsWith("/") ? nextParam : "/dashboard";
+  const next = nextParam?.startsWith("/") ? nextParam : null;
 
   if (token_hash && type) {
     const supabase = await createClient();
@@ -27,7 +28,13 @@ export async function GET(request: NextRequest) {
     });
 
     if (!error) {
-      redirect(next);
+      // Recovery (password reset) has an explicit next (the update page); honor
+      // it. Otherwise route by onboarding status: no lane -> /onboarding.
+      if (next) {
+        redirect(next);
+      }
+      const destination = await getPostAuthDestination();
+      redirect(destination);
     }
   }
 

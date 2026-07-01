@@ -1,3 +1,3 @@
-select slug, access_level, is_public_preview, published
-from public.lessons
-where slug = 'what-is-react';
+select email, onboarding_lane from public.profiles p
+join auth.users u on u.id = p.id
+where u.email = 'onboard01@test.com';
