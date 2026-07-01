@@ -1,13 +1,14 @@
 import Link from "next/link";
 
 import { Container } from "@/components/layout/Container";
+import { LogoutButton } from "@/components/layout/LogoutButton";
 import { buttonVariants } from "@/components/ui/button";
 
 interface NavigationProps {
   /**
-   * Auth-aware CTA state. Defaults to logged-out. Once Supabase auth is wired
-   * (Phase 2), pass this from a Server Component that reads the session, to
-   * flip the CTAs from "Log in / Sign up" to "Dashboard".
+   * Auth-aware CTA state. Defaults to logged-out. The (public) layout reads the
+   * session in a Server Component and passes this, flipping the CTAs from
+   * "Log in / Sign up" to "Dashboard / Log out".
    */
   isAuthenticated?: boolean;
 }
@@ -44,12 +45,15 @@ export function Navigation({ isAuthenticated = false }: NavigationProps) {
           {/* Auth-aware CTA slots */}
           <div className="flex items-center gap-2">
             {isAuthenticated ? (
-              <Link
-                href="/dashboard"
-                className={buttonVariants({ variant: "default", size: "sm" })}
-              >
-                Dashboard
-              </Link>
+              <>
+                <Link
+                  href="/dashboard"
+                  className={buttonVariants({ variant: "default", size: "sm" })}
+                >
+                  Dashboard
+                </Link>
+                <LogoutButton />
+              </>
             ) : (
               <>
                 <Link
