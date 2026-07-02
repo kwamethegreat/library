@@ -3,6 +3,8 @@ import Link from "next/link";
 import { Container } from "@/components/layout/Container";
 import { LogoutButton } from "@/components/layout/LogoutButton";
 import { buttonVariants } from "@/components/ui/button";
+import { TierBadge } from "@/components/ui/TierBadge";
+import type { UserTier } from "@/types";
 
 interface NavigationProps {
   /**
@@ -11,6 +13,10 @@ interface NavigationProps {
    * "Log in / Sign up" to "Dashboard / Log out".
    */
   isAuthenticated?: boolean;
+  /**
+   * The logged-in user's tier, shown as a badge. Undefined when logged out.
+   */
+  tier?: UserTier;
 }
 
 const navLinks = [
@@ -18,7 +24,7 @@ const navLinks = [
   { href: "/pricing", label: "Pricing" },
 ];
 
-export function Navigation({ isAuthenticated = false }: NavigationProps) {
+export function Navigation({ isAuthenticated = false, tier }: NavigationProps) {
   return (
     <header className="border-b border-border">
       <Container>
@@ -46,6 +52,7 @@ export function Navigation({ isAuthenticated = false }: NavigationProps) {
           <div className="flex items-center gap-2">
             {isAuthenticated ? (
               <>
+                {tier && <TierBadge tier={tier} />}
                 <Link
                   href="/dashboard"
                   className={buttonVariants({ variant: "default", size: "sm" })}
