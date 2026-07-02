@@ -7,6 +7,9 @@ import { z } from "zod";
  *              Validated eagerly when this module is imported.
  * getServerEnv() — secrets, server-only. Validated lazily on first call and
  *              guarded so it can never run in a Client Component / browser bundle.
+ * getRateLimitEnv() — the Upstash Redis vars, validated independently of the
+ *              full server schema so the rate limiter works before the other
+ *              integrations (Stripe, Mux, …) have their keys set.
  *
  * IMPORTANT: validation runs on import. Until .env.local holds real values, do
  * NOT import this at global startup (e.g. instrumentation.ts) or the app will
@@ -42,6 +45,11 @@ const serverSchema = z.object({
   SENTRY_AUTH_TOKEN: z.string().min(1),
   SENTRY_ORG: z.string().min(1),
   SENTRY_PROJECT: z.string().min(1),
+});
+
+const rateLimitSchema = z.object({
+  UPSTASH_REDIS_REST_URL: z.url(),
+  UPSTASH_REDIS_REST_TOKEN: z.string().min(1),
 });
 
 function formatIssues(error: z.ZodError): string {
@@ -94,4 +102,27 @@ export function getServerEnv(): z.infer<typeof serverSchema> {
     cachedServerEnv = parsed.data;
   }
   return cachedServerEnv;
+}
+
+// --- Rate-limit env: lazy + guarded, validated independently ---
+// Kept separate from serverSchema so the rate limiter can run before the other
+// integrations have their secrets set.
+let cachedRateLimitEnv: z.infer<typeof rateLimitSchema> | undefined;
+export function getRateLimitEnv(): z.infer<typeof rateLimitSchema> {
+  if (typeof window !== "undefined") {
+    throw new Error(
+      "getRateLimitEnv() was called in client code. Server-only env vars are not available in the browser.",
+    );
+  }
+  if (!cachedRateLimitEnv) {
+    const parsed = rateLimitSchema.safeParse(process.env);
+    if (!parsed.success) {
+      throw new Error(
+        `Invalid rate-limit environment variables:\n${formatIssues(parsed.error)}\n` +
+          `Set UPSTASH_REDIS_REST_URL and UPSTASH_REDIS_REST_TOKEN in .env.local.`,
+      );
+    }
+    cachedRateLimitEnv = parsed.data;
+  }
+  return cachedRateLimitEnv;
 }
