@@ -22,6 +22,10 @@ const clientSchema = z.object({
   NEXT_PUBLIC_POSTHOG_KEY: z.string().min(1),
   NEXT_PUBLIC_POSTHOG_HOST: z.url(),
   NEXT_PUBLIC_SENTRY_DSN: z.string().min(1),
+  NEXT_PUBLIC_OAUTH_ENABLED: z
+    .enum(["true", "false"])
+    .default("false")
+    .transform((v) => v === "true"),
 });
 
 const serverSchema = z.object({
@@ -61,20 +65,18 @@ const clientParsed = clientSchema.safeParse({
   NEXT_PUBLIC_POSTHOG_KEY: process.env.NEXT_PUBLIC_POSTHOG_KEY,
   NEXT_PUBLIC_POSTHOG_HOST: process.env.NEXT_PUBLIC_POSTHOG_HOST,
   NEXT_PUBLIC_SENTRY_DSN: process.env.NEXT_PUBLIC_SENTRY_DSN,
+  NEXT_PUBLIC_OAUTH_ENABLED: process.env.NEXT_PUBLIC_OAUTH_ENABLED,
 });
-
 if (!clientParsed.success) {
   throw new Error(
     `Invalid client environment variables:\n${formatIssues(clientParsed.error)}\n` +
       `Check your .env.local against .env.example.`,
   );
 }
-
 export const clientEnv = clientParsed.data;
 
 // --- Server env: lazy + guarded, server-only ---
 let cachedServerEnv: z.infer<typeof serverSchema> | undefined;
-
 export function getServerEnv(): z.infer<typeof serverSchema> {
   if (typeof window !== "undefined") {
     throw new Error(
