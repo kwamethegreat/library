@@ -1,0 +1,1 @@
+select proname from pg_proc where proname = 'ensure_profile_for_current_user';

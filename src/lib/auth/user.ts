@@ -4,6 +4,8 @@ import { createClient } from "@/lib/supabase/server";
 import type { Tables } from "@/types";
 import type { UserRole, UserTier } from "@/types/access";
 
+import { ensureProfile } from "./ensure-profile";
+
 export type Profile = Tables<"profiles">;
 
 /**
@@ -21,16 +23,19 @@ export async function getCurrentUser(): Promise<User | null> {
 
 /**
  * The current user's profile row (role, tier, display_name, ...), or null if
- * not signed in or the profile is missing. RLS allows a user to read their own
- * profile, so this works through the normal server client.
+ * not signed in. RLS allows a user to read their own profile, so the read
+ * works through the normal server client.
+ *
+ * Self-healing: if the user is authenticated but has no profile row (a rare
+ * edge -- see ensureProfile), we lazily create one with safe defaults and
+ * return it, so downstream code can always rely on a profile existing for a
+ * signed-in user.
  */
 export async function getUserProfile(): Promise<Profile | null> {
   const supabase = await createClient();
-
   const {
     data: { user },
   } = await supabase.auth.getUser();
-
   if (!user) return null;
 
   const { data: profile, error } = await supabase
@@ -41,6 +46,11 @@ export async function getUserProfile(): Promise<Profile | null> {
 
   if (error) {
     throw new Error(`Failed to load profile: ${error.message}`);
+  }
+
+  // Authenticated but no profile -> lazily create one, then use it.
+  if (!profile) {
+    return ensureProfile(user);
   }
 
   return profile;

@@ -3,18 +3,19 @@ import { z } from "zod";
 /**
  * Typed environment loader.
  *
- * clientEnv  — NEXT_PUBLIC_* vars, safe in the browser (inlined at build time).
+ * clientEnv  - NEXT_PUBLIC_* vars, safe in the browser (inlined at build time).
  *              Validated eagerly when this module is imported.
- * getServerEnv() — secrets, server-only. Validated lazily on first call and
- *              guarded so it can never run in a Client Component / browser bundle.
- * getRateLimitEnv() — the Upstash Redis vars, validated independently of the
- *              full server schema so the rate limiter works before the other
- *              integrations (Stripe, Mux, …) have their keys set.
+ * getServerEnv() - the full set of server secrets, validated together. Call
+ *              this only from code paths that actually need those integrations
+ *              (Stripe, Mux, Resend, Sentry). Server-only + guarded.
+ * getSupabaseServiceEnv() - JUST the Supabase service-role key, validated
+ *              independently so the admin client works before the other
+ *              integrations have their secrets set.
+ * getRateLimitEnv() - JUST the Upstash Redis vars, same rationale.
  *
  * IMPORTANT: validation runs on import. Until .env.local holds real values, do
  * NOT import this at global startup (e.g. instrumentation.ts) or the app will
- * refuse to boot. Import clientEnv / getServerEnv() inside the specific modules
- * that need them as you build each integration.
+ * refuse to boot. Import the specific getter inside the module that needs it.
  */
 
 const clientSchema = z.object({
@@ -45,6 +46,10 @@ const serverSchema = z.object({
   SENTRY_AUTH_TOKEN: z.string().min(1),
   SENTRY_ORG: z.string().min(1),
   SENTRY_PROJECT: z.string().min(1),
+});
+
+const supabaseServiceSchema = z.object({
+  SUPABASE_SERVICE_ROLE_KEY: z.string().min(1),
 });
 
 const rateLimitSchema = z.object({
@@ -104,9 +109,30 @@ export function getServerEnv(): z.infer<typeof serverSchema> {
   return cachedServerEnv;
 }
 
+// --- Supabase service-role env: lazy + guarded, validated independently ---
+// Kept separate from serverSchema so the admin client can run before the other
+// integrations (Stripe, Mux, Resend, Sentry) have their secrets set.
+let cachedSupabaseServiceEnv: z.infer<typeof supabaseServiceSchema> | undefined;
+export function getSupabaseServiceEnv(): z.infer<typeof supabaseServiceSchema> {
+  if (typeof window !== "undefined") {
+    throw new Error(
+      "getSupabaseServiceEnv() was called in client code. Server-only env vars are not available in the browser.",
+    );
+  }
+  if (!cachedSupabaseServiceEnv) {
+    const parsed = supabaseServiceSchema.safeParse(process.env);
+    if (!parsed.success) {
+      throw new Error(
+        `Invalid Supabase service environment:\n${formatIssues(parsed.error)}\n` +
+          `Set SUPABASE_SERVICE_ROLE_KEY in .env.local.`,
+      );
+    }
+    cachedSupabaseServiceEnv = parsed.data;
+  }
+  return cachedSupabaseServiceEnv;
+}
+
 // --- Rate-limit env: lazy + guarded, validated independently ---
-// Kept separate from serverSchema so the rate limiter can run before the other
-// integrations have their secrets set.
 let cachedRateLimitEnv: z.infer<typeof rateLimitSchema> | undefined;
 export function getRateLimitEnv(): z.infer<typeof rateLimitSchema> {
   if (typeof window !== "undefined") {
