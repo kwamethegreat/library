@@ -14,23 +14,28 @@ export type Course = Tables<"courses">;
 const COURSE_CARD_COLUMNS =
   "id, slug, title, system_moat_identifier, code_asset_flag, validation_lab_status, level, access_level, category, track_id, has_scaffold, has_gist, has_sandbox, has_local_mirror";
 
-/** Filters for the published-courses catalog query. All optional. */
+/**
+ * Filters for the published-courses catalog query. All optional. `trackId` is
+ * the resolved track UUID (the caller maps the URL's track slug to an id). The
+ * asset-flag filters and labActive only NARROW when true -- a false/omitted
+ * flag means "don't filter by it", not "must be false".
+ */
 export interface CourseFilters {
   trackId?: string;
   level?: CourseLevel;
-  /**
-   * Filters the CATALOG by tier (e.g. "show only free courses"). This is
-   * catalog filtering only -- it shows which courses EXIST at a tier. It does
-   * NOT grant access to their content; consumption is gated separately by the
-   * server-side entitlement check.
-   */
   accessLevel?: AccessLevel;
+  category?: CourseCategory;
+  hasScaffold?: boolean;
+  hasGist?: boolean;
+  hasSandbox?: boolean;
+  hasLocalMirror?: boolean;
+  labActive?: boolean;
 }
 
 /**
- * Published courses for the catalog, with optional track/level/access
- * filtering, ordered for display. Returns the lean CourseCardData shape (only
- * the columns the CourseCard renders), not full rows.
+ * Published courses for the catalog, with optional filtering, ordered for
+ * display. Returns the lean CourseCardData shape (only the columns the
+ * CourseCard renders), not full rows.
  *
  * RLS restricts anon/authenticated callers to published rows; we also filter
  * explicitly (belt-and-suspenders), matching the rest of the data layer.
@@ -53,6 +58,24 @@ export async function getPublishedCourses(
   }
   if (filters.accessLevel) {
     query = query.eq("access_level", filters.accessLevel);
+  }
+  if (filters.category) {
+    query = query.eq("category", filters.category);
+  }
+  if (filters.hasScaffold) {
+    query = query.eq("has_scaffold", true);
+  }
+  if (filters.hasGist) {
+    query = query.eq("has_gist", true);
+  }
+  if (filters.hasSandbox) {
+    query = query.eq("has_sandbox", true);
+  }
+  if (filters.hasLocalMirror) {
+    query = query.eq("has_local_mirror", true);
+  }
+  if (filters.labActive) {
+    query = query.eq("validation_lab_status", "active");
   }
 
   const { data, error } = await query.order("sort_order", {
