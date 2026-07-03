@@ -22,6 +22,9 @@ export type CourseLevel = "beginner" | "intermediate" | "advanced";
 /** courses.validation_lab_status */
 export type ValidationLabStatus = "none" | "draft" | "active" | "archived";
 
+/** courses.category (four operational pillars) */
+export type CourseCategory = "LEARN" | "PROJ" | "AUTO" | "CAREER";
+
 /** lessons.video_provider (nullable in the schema) */
 export type VideoProvider = "mux" | "youtube" | "vimeo";
 
@@ -36,6 +39,13 @@ export type AssetType =
   | "dataset"
   | "image"
   | "archive";
+
+/** The denormalized asset-flag columns on courses. */
+export type CourseAssetFlag =
+  | "has_scaffold"
+  | "has_gist"
+  | "has_sandbox"
+  | "has_local_mirror";
 
 // Note: AccessLevel ("free" | "paid" | "enterprise") is reused from
 // @/types/access for every access_level column.
@@ -54,10 +64,14 @@ export type Asset = Tables<"assets">;
 // override the loose `string` (or `string | null`) from the generated row with
 // the real union, so exhaustive switches and prop typing work.
 
-export type CourseView = Omit<Course, "level" | "validation_lab_status" | "access_level"> & {
+export type CourseView = Omit<
+  Course,
+  "level" | "validation_lab_status" | "access_level" | "category"
+> & {
   level: CourseLevel;
   validation_lab_status: ValidationLabStatus;
   access_level: AccessLevel;
+  category: CourseCategory | null;
 };
 
 export type LessonView = Omit<Lesson, "video_provider" | "access_level"> & {
@@ -87,11 +101,11 @@ export type CourseWithModules = CourseView & {
   modules: ModuleWithLessons[];
 };
 
-// --- Catalog card view-model (item 97 CourseCard) --------------------------
+// --- Catalog card view-model (CourseCard) ----------------------------------
 // The operational card shows System Moat Identifier, Challenge (course) Title,
 // Code Asset Flag, and Validation Lab Status -- NOT review stars or generic
-// metrics. This is the minimal shape the card needs, so the catalog fetcher
-// can select just these columns.
+// metrics. Includes category and the asset flags so cards and filters can use
+// them.
 
 export type CourseCardData = Pick<
   CourseView,
@@ -103,5 +117,11 @@ export type CourseCardData = Pick<
   | "validation_lab_status"
   | "level"
   | "access_level"
+  | "category"
   | "track_id"
->;
+> & {
+  has_scaffold: boolean;
+  has_gist: boolean;
+  has_sandbox: boolean;
+  has_local_mirror: boolean;
+};

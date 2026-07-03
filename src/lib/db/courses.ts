@@ -3,6 +3,7 @@ import type { Tables } from "@/types";
 import type { AccessLevel } from "@/types/access";
 import type {
   CourseCardData,
+  CourseCategory,
   CourseLevel,
   ValidationLabStatus,
 } from "@/types/content";
@@ -11,7 +12,7 @@ export type Course = Tables<"courses">;
 
 /** Columns the catalog card needs -- keep in sync with CourseCardData. */
 const COURSE_CARD_COLUMNS =
-  "id, slug, title, system_moat_identifier, code_asset_flag, validation_lab_status, level, access_level, track_id";
+  "id, slug, title, system_moat_identifier, code_asset_flag, validation_lab_status, level, access_level, category, track_id, has_scaffold, has_gist, has_sandbox, has_local_mirror";
 
 /** Filters for the published-courses catalog query. All optional. */
 export interface CourseFilters {
@@ -63,13 +64,23 @@ export async function getPublishedCourses(
   }
 
   // The DB CHECK constraints guarantee level / validation_lab_status /
-  // access_level are valid unions; the generated types widen them to string,
-  // so we assert the narrowed CourseCardData shape at this boundary.
+  // access_level / category are valid unions; the generated types widen them to
+  // string, so we assert the narrowed CourseCardData shape at this boundary.
   return (data ?? []).map((row) => ({
-    ...row,
-    level: row.level as CourseLevel,
+    id: row.id,
+    slug: row.slug,
+    title: row.title,
+    system_moat_identifier: row.system_moat_identifier,
+    code_asset_flag: row.code_asset_flag,
     validation_lab_status: row.validation_lab_status as ValidationLabStatus,
+    level: row.level as CourseLevel,
     access_level: row.access_level as AccessLevel,
+    category: row.category as CourseCategory | null,
+    track_id: row.track_id,
+    has_scaffold: row.has_scaffold,
+    has_gist: row.has_gist,
+    has_sandbox: row.has_sandbox,
+    has_local_mirror: row.has_local_mirror,
   }));
 }
 

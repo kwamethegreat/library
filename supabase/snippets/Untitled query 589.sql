@@ -1,3 +1,2 @@
-select p.id, u.email, p.role, p.tier, p.display_name
-   from public.profiles p join auth.users u on u.id = p.id
-   order by u.created_at desc limit 5;
+select slug, category, level, access_level, has_scaffold, has_gist, has_sandbox, has_local_mirror
+from public.courses where published = true order by sort_order;

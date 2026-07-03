@@ -172,9 +172,14 @@ export type Database = {
       courses: {
         Row: {
           access_level: string
+          category: string | null
           code_asset_flag: boolean
           created_at: string
           description: string | null
+          has_gist: boolean
+          has_local_mirror: boolean
+          has_sandbox: boolean
+          has_scaffold: boolean
           id: string
           level: string
           published: boolean
@@ -188,9 +193,14 @@ export type Database = {
         }
         Insert: {
           access_level?: string
+          category?: string | null
           code_asset_flag?: boolean
           created_at?: string
           description?: string | null
+          has_gist?: boolean
+          has_local_mirror?: boolean
+          has_sandbox?: boolean
+          has_scaffold?: boolean
           id?: string
           level?: string
           published?: boolean
@@ -204,9 +214,14 @@ export type Database = {
         }
         Update: {
           access_level?: string
+          category?: string | null
           code_asset_flag?: boolean
           created_at?: string
           description?: string | null
+          has_gist?: boolean
+          has_local_mirror?: boolean
+          has_sandbox?: boolean
+          has_scaffold?: boolean
           id?: string
           level?: string
           published?: boolean
