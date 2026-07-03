@@ -2,6 +2,7 @@
 
 // App-specific union types (AccessLevel, UserTier, UserRole).
 export * from "./access";
+export * from "./content";
 
 // Re-export the type helpers the Supabase CLI generates in database.ts,
 // so the rest of the app can import them from "@/types".
