@@ -1,5 +1,9 @@
 import type { User } from "@supabase/supabase-js";
+import { redirect } from "next/navigation";
 import { beforeEach, describe, expect, it, vi } from "vitest";
+
+import { requireAdmin, requireUser } from "@/lib/auth/guards";
+import { getCurrentUser, getUserProfile } from "@/lib/auth/user";
 
 // vi.mock calls are hoisted above the imports by Vitest.
 
@@ -24,11 +28,6 @@ vi.mock("next/navigation", () => ({
     throw new Error(`NEXT_REDIRECT:${url}`);
   }),
 }));
-
-import { redirect } from "next/navigation";
-
-import { requireAdmin, requireUser } from "@/lib/auth/guards";
-import { getCurrentUser, getUserProfile } from "@/lib/auth/user";
 
 const mockGetCurrentUser = vi.mocked(getCurrentUser);
 const mockGetUserProfile = vi.mocked(getUserProfile);

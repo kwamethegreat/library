@@ -1,40 +1,44 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
+import { getUserTier } from "@/lib/auth/user";
+
 // Mock only the Supabase server client that user.ts imports, so getUserProfile
 // has no real dependency. We drive getUserProfile's result by controlling what
-// the mocked client's query chain returns.
+// the mocked client's query chain returns via `maybeSingle`.
 
 const maybeSingle = vi.fn();
 
 vi.mock("@/lib/supabase/server", () => ({
-  createClient: vi.fn(async () => ({
-    auth: {
-      getUser: vi.fn(async () => ({
-        data: { user: { id: "user-123" } },
-      })),
-    },
-    from: vi.fn(() => ({
-      select: vi.fn(() => ({
-        eq: vi.fn(() => ({
-          maybeSingle,
+  createClient: vi.fn(() =>
+    Promise.resolve({
+      auth: {
+        getUser: vi.fn(() =>
+          Promise.resolve({ data: { user: { id: "user-123" } } }),
+        ),
+      },
+      from: vi.fn(() => ({
+        select: vi.fn(() => ({
+          eq: vi.fn(() => ({
+            maybeSingle,
+          })),
         })),
       })),
-    })),
-  })),
+    }),
+  ),
 }));
 
 // ensure-profile is imported by user.ts; stub it so a missing profile doesn't
 // try to heal via RPC during these unit tests.
 vi.mock("@/lib/auth/ensure-profile", () => ({
-  ensureProfile: vi.fn(async () => ({
-    id: "user-123",
-    role: "user",
-    tier: "free",
-    display_name: null,
-  })),
+  ensureProfile: vi.fn(() =>
+    Promise.resolve({
+      id: "user-123",
+      role: "user",
+      tier: "free",
+      display_name: null,
+    }),
+  ),
 }));
-
-import { getUserTier } from "@/lib/auth/user";
 
 beforeEach(() => {
   vi.clearAllMocks();
