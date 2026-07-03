@@ -18,7 +18,8 @@ const COURSE_CARD_COLUMNS =
  * Filters for the published-courses catalog query. All optional. `trackId` is
  * the resolved track UUID (the caller maps the URL's track slug to an id). The
  * asset-flag filters and labActive only NARROW when true -- a false/omitted
- * flag means "don't filter by it", not "must be false".
+ * flag means "don't filter by it", not "must be false". `search` is a free-text
+ * query run against the full-text search_vector (title + description).
  */
 export interface CourseFilters {
   trackId?: string;
@@ -30,12 +31,12 @@ export interface CourseFilters {
   hasSandbox?: boolean;
   hasLocalMirror?: boolean;
   labActive?: boolean;
+  search?: string;
 }
 
 /**
- * Published courses for the catalog, with optional filtering, ordered for
- * display. Returns the lean CourseCardData shape (only the columns the
- * CourseCard renders), not full rows.
+ * Published courses for the catalog, with optional filtering + full-text
+ * search, ordered for display. Returns the lean CourseCardData shape.
  *
  * RLS restricts anon/authenticated callers to published rows; we also filter
  * explicitly (belt-and-suspenders), matching the rest of the data layer.
@@ -76,6 +77,16 @@ export async function getPublishedCourses(
   }
   if (filters.labActive) {
     query = query.eq("validation_lab_status", "active");
+  }
+
+  const search = filters.search?.trim();
+  if (search) {
+    // Full-text search against the generated search_vector. `websearch` mode
+    // parses the query like a search engine (quoted phrases, OR, -exclusion).
+    query = query.textSearch("search_vector", search, {
+      type: "websearch",
+      config: "english",
+    });
   }
 
   const { data, error } = await query.order("sort_order", {

@@ -20,6 +20,7 @@ export interface CatalogFilterState {
   hasSandbox: boolean;
   hasLocalMirror: boolean;
   labActive: boolean;
+  search?: string;
 }
 
 const LEVELS = ["beginner", "intermediate", "advanced"] as const;
@@ -58,6 +59,7 @@ function reader(params: ParamsInput) {
  */
 export function parseCatalogFilters(params: ParamsInput): CatalogFilterState {
   const get = reader(params);
+  const search = get("q")?.trim();
   return {
     track: get("track") || undefined,
     level: oneOf(get("level"), LEVELS),
@@ -68,6 +70,7 @@ export function parseCatalogFilters(params: ParamsInput): CatalogFilterState {
     hasSandbox: get("has_sandbox") === "1",
     hasLocalMirror: get("has_local_mirror") === "1",
     labActive: get("lab") === "active",
+    search: search || undefined,
   };
 }
 
@@ -82,6 +85,7 @@ export function hasActiveCatalogFilters(state: CatalogFilterState): boolean {
       state.hasGist ||
       state.hasSandbox ||
       state.hasLocalMirror ||
-      state.labActive,
+      state.labActive ||
+      state.search,
   );
 }

@@ -1,6 +1,7 @@
 import { Suspense } from "react";
 
 import { CatalogFilters } from "@/components/content/CatalogFilters";
+import { CatalogSearch } from "@/components/content/CatalogSearch";
 import {
   CourseGrid,
   CourseGridSkeleton,
@@ -17,15 +18,14 @@ export const metadata = {
 /**
  * Async server component: fetches courses for the given filters and renders the
  * grid. Isolated in its own component so the page can wrap it in <Suspense> --
- * the tabs/filters render immediately while the (potentially filtered) course
- * query resolves.
+ * the tabs/search/filters render immediately while the query resolves.
  */
 async function CatalogResults({ filters }: { filters: CourseFilters }) {
   const courses = await getPublishedCourses(filters);
   return (
     <CourseGrid
       courses={courses}
-      emptyMessage="No courses match these filters."
+      emptyMessage="No courses match your search or filters."
     />
   );
 }
@@ -56,6 +56,7 @@ export default async function CatalogPage({
     hasSandbox: filterState.hasSandbox,
     hasLocalMirror: filterState.hasLocalMirror,
     labActive: filterState.labActive,
+    search: filterState.search,
   };
 
   return (
@@ -66,6 +67,10 @@ export default async function CatalogPage({
       </p>
 
       <div className="mb-6">
+        <CatalogSearch />
+      </div>
+
+      <div className="mb-6">
         <TrackTabs tracks={tracks} activeTrack={filterState.track} />
       </div>
 
@@ -73,7 +78,7 @@ export default async function CatalogPage({
         <CatalogFilters tracks={tracks} />
       </div>
 
-      {/* Re-suspend when the filters change so the skeleton shows during
+      {/* Re-suspend when filters/search change so the skeleton shows during
           each new fetch. */}
       <Suspense
         key={JSON.stringify(courseFilters)}

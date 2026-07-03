@@ -183,6 +183,7 @@ export type Database = {
           id: string
           level: string
           published: boolean
+          search_vector: unknown
           slug: string
           sort_order: number
           system_moat_identifier: string | null
@@ -204,6 +205,7 @@ export type Database = {
           id?: string
           level?: string
           published?: boolean
+          search_vector?: unknown
           slug: string
           sort_order?: number
           system_moat_identifier?: string | null
@@ -225,6 +227,7 @@ export type Database = {
           id?: string
           level?: string
           published?: boolean
+          search_vector?: unknown
           slug?: string
           sort_order?: number
           system_moat_identifier?: string | null
