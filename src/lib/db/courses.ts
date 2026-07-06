@@ -34,21 +34,42 @@ export interface CourseFilters {
   search?: string;
 }
 
+/** A one-based page request. */
+export interface CoursePagination {
+  page: number;
+  pageSize: number;
+}
+
+/** A page of courses plus the total match count, for pagination controls. */
+export interface PaginatedCourses {
+  courses: CourseCardData[];
+  /**
+   * Total published rows matching `filters` across ALL pages (not just the
+   * returned slice). Respects RLS + the same filters, so it's the correct
+   * denominator for page-count math.
+   */
+  total: number;
+}
+
 /**
  * Published courses for the catalog, with optional filtering + full-text
- * search, ordered for display. Returns the lean CourseCardData shape.
+ * search, ordered for display. When `pagination` is supplied, returns just that
+ * page of results alongside the total match count.
  *
  * RLS restricts anon/authenticated callers to published rows; we also filter
  * explicitly (belt-and-suspenders), matching the rest of the data layer.
  */
 export async function getPublishedCourses(
   filters: CourseFilters = {},
-): Promise<CourseCardData[]> {
+  pagination?: CoursePagination,
+): Promise<PaginatedCourses> {
   const supabase = await createClient();
 
+  // `count: "exact"` returns the total number of matching rows regardless of
+  // the range applied below -- exactly what pagination needs.
   let query = supabase
     .from("courses")
-    .select(COURSE_CARD_COLUMNS)
+    .select(COURSE_CARD_COLUMNS, { count: "exact" })
     .eq("published", true);
 
   if (filters.trackId) {
@@ -89,9 +110,15 @@ export async function getPublishedCourses(
     });
   }
 
-  const { data, error } = await query.order("sort_order", {
-    ascending: true,
-  });
+  query = query.order("sort_order", { ascending: true });
+
+  if (pagination) {
+    const from = (pagination.page - 1) * pagination.pageSize;
+    const to = from + pagination.pageSize - 1;
+    query = query.range(from, to);
+  }
+
+  const { data, error, count } = await query;
 
   if (error) {
     throw new Error(`Failed to fetch courses: ${error.message}`);
@@ -100,7 +127,7 @@ export async function getPublishedCourses(
   // The DB CHECK constraints guarantee level / validation_lab_status /
   // access_level / category are valid unions; the generated types widen them to
   // string, so we assert the narrowed CourseCardData shape at this boundary.
-  return (data ?? []).map((row) => ({
+  const courses: CourseCardData[] = (data ?? []).map((row) => ({
     id: row.id,
     slug: row.slug,
     title: row.title,
@@ -116,6 +143,8 @@ export async function getPublishedCourses(
     has_sandbox: row.has_sandbox,
     has_local_mirror: row.has_local_mirror,
   }));
+
+  return { courses, total: count ?? 0 };
 }
 
 /** Published courses within a track, ordered. */
