@@ -45,7 +45,7 @@ export default function HomePage() {
           </p>
           <div className="flex flex-wrap items-center justify-center gap-3">
             <Link
-              href="/courses"
+              href="/catalog"
               className={buttonVariants({ variant: "default", size: "lg" })}
             >
               Browse courses

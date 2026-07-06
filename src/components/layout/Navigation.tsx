@@ -19,8 +19,11 @@ interface NavigationProps {
   tier?: UserTier;
 }
 
+// NOTE: "Courses" points at /catalog -- the /courses index route was removed in
+// favour of /catalog (item 102). /pricing is a known TODO (route not built yet;
+// arrives with the homepage/pricing work in item 106+).
 const navLinks = [
-  { href: "/courses", label: "Courses" },
+  { href: "/catalog", label: "Courses" },
   { href: "/pricing", label: "Pricing" },
 ];
 
