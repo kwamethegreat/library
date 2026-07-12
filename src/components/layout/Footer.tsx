@@ -1,27 +1,32 @@
 import Link from "next/link";
 
 import { Container } from "@/components/layout/Container";
+import { CTA, PRICING_HREF } from "@/lib/navigation/cta";
 
+/**
+ * Footer link columns.
+ *
+ * Every href here must resolve to a page that actually exists -- a footer full
+ * of 404s is worse than a short footer. The Company (About/Contact) and Legal
+ * (Privacy/Terms) columns are therefore NOT rendered yet: those pages are built
+ * at item 301 (Phase 20). Restore them there.
+ *
+ * "Pricing" anchors to the homepage teaser until /pricing ships at item 140.
+ */
 const footerSections = [
   {
     heading: "Product",
     links: [
-      { href: "/courses", label: "Courses" },
-      { href: "/pricing", label: "Pricing" },
+      { href: CTA.browseCurriculum.href, label: "Catalog" },
+      { href: CTA.freeLesson.href, label: "Free lesson" },
+      { href: PRICING_HREF, label: "Pricing" },
     ],
   },
   {
-    heading: "Company",
+    heading: "Account",
     links: [
-      { href: "/about", label: "About" }, // TODO: build page
-      { href: "/contact", label: "Contact" }, // TODO: build page
-    ],
-  },
-  {
-    heading: "Legal",
-    links: [
-      { href: "/privacy", label: "Privacy Policy" }, // TODO: legal page
-      { href: "/terms", label: "Terms of Service" }, // TODO: legal page
+      { href: "/login", label: "Log in" },
+      { href: "/signup", label: "Sign up" },
     ],
   },
 ];
@@ -32,10 +37,9 @@ export function Footer() {
   return (
     <footer className="mt-auto border-t border-border">
       <Container className="py-12">
-        {/* Link columns */}
         <div className="grid grid-cols-2 gap-8 md:grid-cols-4">
           {/* Brand */}
-          <div className="col-span-2 md:col-span-1">
+          <div className="col-span-2 md:col-span-2">
             <Link href="/" className="text-lg font-semibold tracking-tight">
               [Product Name]
             </Link>
@@ -66,9 +70,9 @@ export function Footer() {
           ))}
         </div>
 
-        {/* Bottom bar — sibling of the grid, full width */}
+        {/* Bottom bar -- sibling of the grid, full width */}
         <div className="mt-10 border-t border-border pt-6 text-sm text-muted-foreground">
-          © {year} [Product Name]. All rights reserved.
+          &copy; {year} [Product Name]. All rights reserved.
         </div>
       </Container>
     </footer>

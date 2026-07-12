@@ -5,6 +5,7 @@ import { Container } from "@/components/layout/Container";
 import { Section } from "@/components/layout/Section";
 import { Badge } from "@/components/ui/badge";
 import { buttonVariants } from "@/components/ui/button";
+import { CTA, HOME_SECTION_IDS } from "@/lib/navigation/cta";
 
 const included = [
   "Every challenge, every track",
@@ -14,15 +15,16 @@ const included = [
 ] as const;
 
 /**
- * Pricing teaser -- not the pricing page (that arrives with Stripe in Phase 7).
- * Sets the value expectation and drives signup. Server component, no client JS.
+ * Pricing teaser -- not the pricing page (that's item 140, Phase 7). Sets the
+ * value expectation and drives signup. Server component, no client JS.
  *
- * TODO(item 107 / Phase 7): point the CTA at /pricing (or straight to Checkout)
- * once those routes exist. For now it drives to signup, which is live.
+ * Carries id="pricing" (scroll-margin so the sticky-ish header doesn't clip the
+ * heading) because the nav/footer "Pricing" links anchor here until the real
+ * /pricing route exists.
  */
 export function PricingTeaser() {
   return (
-    <Section>
+    <Section id={HOME_SECTION_IDS.pricing} className="scroll-mt-20">
       <Container size="narrow">
         <div className="rounded-2xl border border-border bg-surface p-8 md:p-10">
           <div className="flex flex-wrap items-center gap-3">
@@ -43,7 +45,7 @@ export function PricingTeaser() {
             {included.map((item) => (
               <li key={item} className="flex items-start gap-3 text-sm">
                 <Check
-                  className="mt-0.5 size-4 shrink-0 text-success"
+                  className="mt-0.5 size-4 shrink-0 text-accent"
                   aria-hidden="true"
                 />
                 <span className="text-foreground">{item}</span>
@@ -53,13 +55,13 @@ export function PricingTeaser() {
 
           <div className="mt-8 flex flex-wrap items-center gap-3">
             <Link
-              href="/signup"
+              href={CTA.foundingPass.href}
               className={buttonVariants({ variant: "default", size: "lg" })}
             >
-              Get Founding Builder Pass
+              {CTA.foundingPass.label}
             </Link>
             <Link
-              href="/catalog?access=free"
+              href={CTA.freeLesson.href}
               className={buttonVariants({ variant: "ghost", size: "lg" })}
             >
               Try a free lesson first

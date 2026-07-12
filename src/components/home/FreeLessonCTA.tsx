@@ -3,13 +3,12 @@ import Link from "next/link";
 import { Container } from "@/components/layout/Container";
 import { Section } from "@/components/layout/Section";
 import { buttonVariants } from "@/components/ui/button";
+import { CTA } from "@/lib/navigation/cta";
 
 /**
  * Mid-page conversion band: the top of the commercial loop (Visitor -> Free
- * Lesson 1). Server component -- no client JS.
- *
- * TODO(item 107 / Phase 5): point at the real free lesson route once
- * /lessons/[slug] exists. Until then this lands on the free-filtered catalog.
+ * Lesson 1). Server component -- no client JS. Target comes from
+ * @/lib/navigation/cta and flips to the real lesson route at item 120.
  */
 export function FreeLessonCTA() {
   return (
@@ -24,10 +23,10 @@ export function FreeLessonCTA() {
             end and keep whatever you build.
           </p>
           <Link
-            href="/catalog?access=free"
+            href={CTA.freeLesson.href}
             className={buttonVariants({ variant: "default", size: "lg" })}
           >
-            Watch Free Lesson
+            {CTA.freeLesson.label}
           </Link>
         </div>
       </Container>

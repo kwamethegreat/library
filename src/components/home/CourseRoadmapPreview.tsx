@@ -5,6 +5,7 @@ import { Container } from "@/components/layout/Container";
 import { Section } from "@/components/layout/Section";
 import { buttonVariants } from "@/components/ui/button";
 import { getPublishedCourses } from "@/lib/db";
+import { CTA } from "@/lib/navigation/cta";
 
 /** How many courses to preview on the homepage. */
 const PREVIEW_COUNT = 3;
@@ -40,10 +41,10 @@ export async function CourseRoadmapPreview() {
             </p>
           </div>
           <Link
-            href="/catalog"
+            href={CTA.browseCurriculum.href}
             className={buttonVariants({ variant: "outline", size: "sm" })}
           >
-            Browse Curriculum
+            {CTA.browseCurriculum.label}
           </Link>
         </div>
 

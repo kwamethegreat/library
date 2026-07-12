@@ -4,6 +4,7 @@ import { Container } from "@/components/layout/Container";
 import { LogoutButton } from "@/components/layout/LogoutButton";
 import { buttonVariants } from "@/components/ui/button";
 import { TierBadge } from "@/components/ui/TierBadge";
+import { PRICING_HREF } from "@/lib/navigation/cta";
 import type { UserTier } from "@/types";
 
 interface NavigationProps {
@@ -19,12 +20,12 @@ interface NavigationProps {
   tier?: UserTier;
 }
 
-// NOTE: "Courses" points at /catalog -- the /courses index route was removed in
-// favour of /catalog (item 102). /pricing is a known TODO (route not built yet;
-// arrives with the homepage/pricing work in item 106+).
+// "Courses" -> /catalog (the /courses index was removed in item 102).
+// "Pricing" -> the homepage pricing teaser until the real /pricing route ships
+// at item 140; PRICING_HREF is the single place that flips.
 const navLinks = [
   { href: "/catalog", label: "Courses" },
-  { href: "/pricing", label: "Pricing" },
+  { href: PRICING_HREF, label: "Pricing" },
 ];
 
 export function Navigation({ isAuthenticated = false, tier }: NavigationProps) {

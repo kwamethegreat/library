@@ -4,14 +4,11 @@ import { Container } from "@/components/layout/Container";
 import { Section } from "@/components/layout/Section";
 import { Badge } from "@/components/ui/badge";
 import { buttonVariants } from "@/components/ui/button";
+import { CTA } from "@/lib/navigation/cta";
 
 /**
  * Homepage hero. Server component -- no interactivity, no client JS.
- *
- * CTA targets (finalised in item 107):
- *  - "Watch Free Lesson" -> the free lesson route doesn't exist until Phase 5,
- *    so for now it points at the catalog filtered to free courses.
- *  - "Browse Curriculum" -> /catalog.
+ * CTA copy/targets come from @/lib/navigation/cta (single source of truth).
  */
 export function HeroSection() {
   return (
@@ -33,16 +30,16 @@ export function HeroSection() {
 
         <div className="flex flex-wrap items-center justify-center gap-3">
           <Link
-            href="/catalog?access=free"
+            href={CTA.freeLesson.href}
             className={buttonVariants({ variant: "default", size: "lg" })}
           >
-            Watch Free Lesson
+            {CTA.freeLesson.label}
           </Link>
           <Link
-            href="/catalog"
+            href={CTA.browseCurriculum.href}
             className={buttonVariants({ variant: "outline", size: "lg" })}
           >
-            Browse Curriculum
+            {CTA.browseCurriculum.label}
           </Link>
         </div>
       </Container>
