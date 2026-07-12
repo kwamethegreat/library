@@ -11,13 +11,12 @@
     "start": "next start",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
-    "test": "echo \"No tests yet\" && exit 0",
-    "test:e2e": "echo \"No e2e tests yet\" && exit 0",
-    "format": "prettier --write .",
-    "db:types": "supabase gen types typescript --local > src/types/database.ts",
     "test": "vitest run",
     "test:watch": "vitest",
-    "test:coverage": "vitest run --coverage"
+    "test:coverage": "vitest run --coverage",
+    "test:e2e": "echo \"No e2e tests yet\" && exit 0",
+    "format": "prettier --write .",
+    "db:types": "supabase gen types typescript --local > src/types/database.ts"
   },
   "dependencies": {
     "@base-ui/react": "^1.6.0",
