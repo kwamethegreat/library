@@ -15,6 +15,14 @@ const COURSE_CARD_COLUMNS =
   "id, slug, title, system_moat_identifier, code_asset_flag, validation_lab_status, level, access_level, category, track_id, has_scaffold, has_gist, has_sandbox, has_local_mirror";
 
 /**
+ * PostgREST's error code for "Requested range not satisfiable" -- returned when
+ * a range's starting offset lies past the end of the result set (e.g. ?page=2
+ * when the filters only match a single page). We treat that as an empty page
+ * rather than a failure; see getPublishedCourses.
+ */
+const PGRST_RANGE_NOT_SATISFIABLE = "PGRST103";
+
+/**
  * Filters for the published-courses catalog query. All optional. `trackId` is
  * the resolved track UUID (the caller maps the URL's track slug to an id). The
  * asset-flag filters and labActive only NARROW when true -- a false/omitted
@@ -49,6 +57,66 @@ export interface PaginatedCourses {
    * denominator for page-count math.
    */
   total: number;
+}
+
+/**
+ * Count published courses matching `filters`, without fetching any rows
+ * (`head: true` sends no body). Only used on the range-past-the-end fallback,
+ * where we need a true total to compute the last valid page.
+ *
+ * NOTE: the filter chain here must stay in sync with getPublishedCourses.
+ */
+async function countPublishedCourses(filters: CourseFilters): Promise<number> {
+  const supabase = await createClient();
+
+  let query = supabase
+    .from("courses")
+    .select("id", { count: "exact", head: true })
+    .eq("published", true);
+
+  if (filters.trackId) {
+    query = query.eq("track_id", filters.trackId);
+  }
+  if (filters.level) {
+    query = query.eq("level", filters.level);
+  }
+  if (filters.accessLevel) {
+    query = query.eq("access_level", filters.accessLevel);
+  }
+  if (filters.category) {
+    query = query.eq("category", filters.category);
+  }
+  if (filters.hasScaffold) {
+    query = query.eq("has_scaffold", true);
+  }
+  if (filters.hasGist) {
+    query = query.eq("has_gist", true);
+  }
+  if (filters.hasSandbox) {
+    query = query.eq("has_sandbox", true);
+  }
+  if (filters.hasLocalMirror) {
+    query = query.eq("has_local_mirror", true);
+  }
+  if (filters.labActive) {
+    query = query.eq("validation_lab_status", "active");
+  }
+
+  const search = filters.search?.trim();
+  if (search) {
+    query = query.textSearch("search_vector", search, {
+      type: "websearch",
+      config: "english",
+    });
+  }
+
+  const { error, count } = await query;
+
+  if (error) {
+    throw new Error(`Failed to count courses: ${error.message}`);
+  }
+
+  return count ?? 0;
 }
 
 /**
@@ -121,6 +189,13 @@ export async function getPublishedCourses(
   const { data, error, count } = await query;
 
   if (error) {
+    // Asking for a page past the end (stale link, hand-typed ?page=99, or a
+    // filter change that shrank the result set) is a 416 from PostgREST, not a
+    // real failure. Report it as an empty page with the TRUE total so callers
+    // can compute the last valid page and redirect there.
+    if (pagination && error.code === PGRST_RANGE_NOT_SATISFIABLE) {
+      return { courses: [], total: await countPublishedCourses(filters) };
+    }
     throw new Error(`Failed to fetch courses: ${error.message}`);
   }
 
