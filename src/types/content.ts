@@ -101,6 +101,69 @@ export type CourseWithModules = CourseView & {
   modules: ModuleWithLessons[];
 };
 
+// --- Course OUTLINE shapes (public course-detail page) ---------------------
+//
+// IMPORTANT -- these are METADATA-ONLY view models, and that is the whole
+// point. The public course page must advertise paid lessons and paid code
+// assets as LOCKED, which means listing that they exist without ever shipping
+// their payload to the client.
+//
+// They are populated by the get_course_lesson_outline() /
+// get_course_code_assets() SECURITY DEFINER RPCs, which structurally cannot
+// return the payload columns:
+//    lessons     -> no body_markdown, no video_asset_id
+//    code_assets -> no code_body, no storage_path
+//
+// The payload is fetched separately, per lesson, behind a server-side
+// entitlement check (Phase 6 / 9). Do NOT widen these types to include payload
+// columns -- that would defeat the paywall.
+
+/** Safe lesson metadata for the course outline. No body, no video asset id. */
+export interface LessonOutline {
+  id: string;
+  module_id: string;
+  slug: string;
+  title: string;
+  lesson_number: number;
+  summary: string | null;
+  access_level: AccessLevel;
+  is_public_preview: boolean;
+  video_provider: VideoProvider | null;
+  /** A video exists -- without disclosing which video. */
+  has_video: boolean;
+}
+
+/** Safe code-asset metadata for the course outline. No code, no storage path. */
+export interface CodeAssetMeta {
+  id: string;
+  lesson_id: string;
+  slug: string;
+  title: string;
+  description: string | null;
+  asset_kind: CodeAssetKind;
+  language: string;
+  access_level: AccessLevel;
+}
+
+/** A lesson in the outline, with the code assets attached to it. */
+export type LessonOutlineWithAssets = LessonOutline & {
+  codeAssets: CodeAssetMeta[];
+};
+
+/** A module in the outline, with its ordered lessons. */
+export type ModuleOutline = Module & {
+  lessons: LessonOutlineWithAssets[];
+};
+
+/**
+ * The full course-detail payload: the course, its published modules, their
+ * published lessons, and every published code asset -- free and paid alike,
+ * metadata only.
+ */
+export type CourseHierarchy = CourseView & {
+  modules: ModuleOutline[];
+};
+
 // --- Catalog card view-model (CourseCard) ----------------------------------
 // The operational card shows System Moat Identifier, Challenge (course) Title,
 // Code Asset Flag, and Validation Lab Status -- NOT review stars or generic

@@ -2,10 +2,18 @@ import { createClient } from "@/lib/supabase/server";
 import type { Tables } from "@/types";
 import type { AccessLevel } from "@/types/access";
 import type {
+  CodeAssetKind,
+  CodeAssetMeta,
   CourseCardData,
   CourseCategory,
+  CourseHierarchy,
   CourseLevel,
+  LessonOutline,
+  LessonOutlineWithAssets,
+  Module,
+  ModuleOutline,
   ValidationLabStatus,
+  VideoProvider,
 } from "@/types/content";
 
 export type Course = Tables<"courses">;
@@ -220,6 +228,141 @@ export async function getPublishedCourses(
   }));
 
   return { courses, total: count ?? 0 };
+}
+
+/**
+ * The full course-detail tree: course -> published modules -> published lessons
+ * -> published code assets. Returns null when the course doesn't exist or isn't
+ * published, so the page can render a 404.
+ *
+ * PAYWALL NOTE -- this is a LISTING fetcher, not a CONTENT fetcher.
+ *
+ * Lessons and code assets come from the get_course_lesson_outline() and
+ * get_course_code_assets() SECURITY DEFINER RPCs, which return PAID rows too,
+ * but only their metadata: never body_markdown, video_asset_id, code_body, or
+ * storage_path. That's what lets the page show locked content as locked --
+ * "see it exists" is not "consume it". The payload is served separately, per
+ * lesson, behind a server-side entitlement check (Phase 6 / 9).
+ *
+ * Do NOT "optimize" this by selecting lessons/code_assets directly: the RLS
+ * client can only see FREE rows, so the paid items would silently vanish from
+ * the outline and there'd be nothing to upsell.
+ */
+export async function getCourseWithHierarchy(
+  slug: string,
+): Promise<CourseHierarchy | null> {
+  const supabase = await createClient();
+
+  const { data: course, error: courseError } = await supabase
+    .from("courses")
+    .select("*")
+    .eq("slug", slug)
+    .eq("published", true)
+    .maybeSingle();
+
+  if (courseError) {
+    throw new Error(`Failed to fetch course: ${courseError.message}`);
+  }
+  if (!course) {
+    return null;
+  }
+
+  const [modulesResult, lessonsResult, codeAssetsResult] = await Promise.all([
+    supabase
+      .from("modules")
+      .select("*")
+      .eq("course_id", course.id)
+      .eq("published", true)
+      .order("sort_order", { ascending: true }),
+    supabase.rpc("get_course_lesson_outline", { p_course_id: course.id }),
+    supabase.rpc("get_course_code_assets", { p_course_id: course.id }),
+  ]);
+
+  if (modulesResult.error) {
+    throw new Error(`Failed to fetch modules: ${modulesResult.error.message}`);
+  }
+  if (lessonsResult.error) {
+    throw new Error(`Failed to fetch lessons: ${lessonsResult.error.message}`);
+  }
+  if (codeAssetsResult.error) {
+    throw new Error(
+      `Failed to fetch code assets: ${codeAssetsResult.error.message}`,
+    );
+  }
+
+  // Narrow the RPC's CHECK-constrained text columns to their real unions.
+  const codeAssets: CodeAssetMeta[] = (codeAssetsResult.data ?? []).map(
+    (row) => ({
+      id: row.id,
+      lesson_id: row.lesson_id,
+      slug: row.slug,
+      title: row.title,
+      description: row.description,
+      asset_kind: row.asset_kind as CodeAssetKind,
+      language: row.language,
+      access_level: row.access_level as AccessLevel,
+    }),
+  );
+
+  // Bucket the code assets by lesson so each lesson carries its own vault.
+  const assetsByLesson = new Map<string, CodeAssetMeta[]>();
+  for (const asset of codeAssets) {
+    const existing = assetsByLesson.get(asset.lesson_id);
+    if (existing) {
+      existing.push(asset);
+    } else {
+      assetsByLesson.set(asset.lesson_id, [asset]);
+    }
+  }
+
+  const lessons: LessonOutlineWithAssets[] = (lessonsResult.data ?? []).map(
+    (row) => {
+      const lesson: LessonOutline = {
+        id: row.id,
+        module_id: row.module_id,
+        slug: row.slug,
+        title: row.title,
+        lesson_number: row.lesson_number,
+        summary: row.summary,
+        access_level: row.access_level as AccessLevel,
+        is_public_preview: row.is_public_preview,
+        video_provider: row.video_provider as VideoProvider | null,
+        has_video: row.has_video,
+      };
+      return {
+        ...lesson,
+        codeAssets: assetsByLesson.get(lesson.id) ?? [],
+      };
+    },
+  );
+
+  // Bucket the lessons by module. The RPC already orders by module sort_order
+  // then lesson_number, so insertion order is display order.
+  const lessonsByModule = new Map<string, LessonOutlineWithAssets[]>();
+  for (const lesson of lessons) {
+    const existing = lessonsByModule.get(lesson.module_id);
+    if (existing) {
+      existing.push(lesson);
+    } else {
+      lessonsByModule.set(lesson.module_id, [lesson]);
+    }
+  }
+
+  const modules: ModuleOutline[] = (modulesResult.data ?? []).map(
+    (module: Module) => ({
+      ...module,
+      lessons: lessonsByModule.get(module.id) ?? [],
+    }),
+  );
+
+  return {
+    ...course,
+    level: course.level as CourseLevel,
+    validation_lab_status: course.validation_lab_status as ValidationLabStatus,
+    access_level: course.access_level as AccessLevel,
+    category: course.category as CourseCategory | null,
+    modules,
+  };
 }
 
 /** Published courses within a track, ordered. */
