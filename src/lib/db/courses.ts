@@ -6,6 +6,7 @@ import type {
   CodeAssetMeta,
   CourseCardData,
   CourseCategory,
+  CourseFormat,
   CourseHierarchy,
   CourseLevel,
   LessonOutline,
@@ -361,6 +362,7 @@ export async function getCourseWithHierarchy(
     validation_lab_status: course.validation_lab_status as ValidationLabStatus,
     access_level: course.access_level as AccessLevel,
     category: course.category as CourseCategory | null,
+    format: course.format as CourseFormat | null,
     modules,
   };
 }

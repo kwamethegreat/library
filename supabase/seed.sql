@@ -17,11 +17,12 @@ values
 on conflict (id) do nothing;
 
 -- ===================== Courses =====================
-insert into public.courses (id, track_id, slug, title, description, level, access_level, published, sort_order, category, has_scaffold, has_gist, has_sandbox, has_local_mirror)
+-- format: sprint = ship one thing fast; masterclass = master a domain.
+insert into public.courses (id, track_id, slug, title, description, level, access_level, published, sort_order, category, format, has_scaffold, has_gist, has_sandbox, has_local_mirror)
 values
-  ('aaaaaaaa-0000-0000-0000-000000000001', '11111111-1111-1111-1111-111111111111', 'intro-to-react', 'Intro to React', 'React fundamentals from scratch.', 'beginner', 'free', true, 1, 'LEARN', true, true, false, false),
-  ('aaaaaaaa-0000-0000-0000-000000000002', '11111111-1111-1111-1111-111111111111', 'advanced-react', 'Advanced React', 'Patterns, performance, and architecture.', 'advanced', 'paid', true, 2, 'PROJ', true, false, true, true),
-  ('aaaaaaaa-0000-0000-0000-000000000003', '22222222-2222-2222-2222-222222222222', 'intro-to-postgres', 'Intro to Postgres', 'Relational databases and SQL.', 'beginner', 'free', true, 1, 'AUTO', false, true, false, false)
+  ('aaaaaaaa-0000-0000-0000-000000000001', '11111111-1111-1111-1111-111111111111', 'intro-to-react', 'Intro to React', 'React fundamentals from scratch.', 'beginner', 'free', true, 1, 'LEARN', 'sprint', true, true, false, false),
+  ('aaaaaaaa-0000-0000-0000-000000000002', '11111111-1111-1111-1111-111111111111', 'advanced-react', 'Advanced React', 'Patterns, performance, and architecture.', 'advanced', 'paid', true, 2, 'PROJ', 'masterclass', true, false, true, true),
+  ('aaaaaaaa-0000-0000-0000-000000000003', '22222222-2222-2222-2222-222222222222', 'intro-to-postgres', 'Intro to Postgres', 'Relational databases and SQL.', 'beginner', 'free', true, 1, 'AUTO', 'masterclass', false, true, false, false)
 on conflict (id) do nothing;
 
 -- ===================== Modules =====================

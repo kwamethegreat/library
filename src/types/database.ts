@@ -176,6 +176,7 @@ export type Database = {
           code_asset_flag: boolean
           created_at: string
           description: string | null
+          format: string | null
           has_gist: boolean
           has_local_mirror: boolean
           has_sandbox: boolean
@@ -198,6 +199,7 @@ export type Database = {
           code_asset_flag?: boolean
           created_at?: string
           description?: string | null
+          format?: string | null
           has_gist?: boolean
           has_local_mirror?: boolean
           has_sandbox?: boolean
@@ -220,6 +222,7 @@ export type Database = {
           code_asset_flag?: boolean
           created_at?: string
           description?: string | null
+          format?: string | null
           has_gist?: boolean
           has_local_mirror?: boolean
           has_sandbox?: boolean

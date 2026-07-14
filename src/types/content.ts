@@ -25,6 +25,14 @@ export type ValidationLabStatus = "none" | "draft" | "active" | "archived";
 /** courses.category (four operational pillars) */
 export type CourseCategory = "LEARN" | "PROJ" | "AUTO" | "CAREER";
 
+/**
+ * courses.format -- editorial INTENT, not length:
+ *   sprint      = ship one thing, fast
+ *   masterclass = master a domain
+ * Nullable in the schema (not every course is classified yet).
+ */
+export type CourseFormat = "sprint" | "masterclass";
+
 /** lessons.video_provider (nullable in the schema) */
 export type VideoProvider = "mux" | "youtube" | "vimeo";
 
@@ -66,12 +74,13 @@ export type Asset = Tables<"assets">;
 
 export type CourseView = Omit<
   Course,
-  "level" | "validation_lab_status" | "access_level" | "category"
+  "level" | "validation_lab_status" | "access_level" | "category" | "format"
 > & {
   level: CourseLevel;
   validation_lab_status: ValidationLabStatus;
   access_level: AccessLevel;
   category: CourseCategory | null;
+  format: CourseFormat | null;
 };
 
 export type LessonView = Omit<Lesson, "video_provider" | "access_level"> & {
