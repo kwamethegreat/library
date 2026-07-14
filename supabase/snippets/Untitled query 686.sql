@@ -1,2 +1,3 @@
-select column_name from information_schema.columns
-where table_name = 'courses' and column_name = 'search_vector';
+set role anon;
+select slug, access_level, has_video from public.get_course_lesson_outline('aaaaaaaa-0000-0000-0000-000000000002');
+reset role;

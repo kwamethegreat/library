@@ -545,6 +545,34 @@ export type Database = {
     }
     Functions: {
       ensure_profile_for_current_user: { Args: never; Returns: undefined }
+      get_course_code_assets: {
+        Args: { p_course_id: string }
+        Returns: {
+          access_level: string
+          asset_kind: string
+          description: string
+          id: string
+          language: string
+          lesson_id: string
+          slug: string
+          title: string
+        }[]
+      }
+      get_course_lesson_outline: {
+        Args: { p_course_id: string }
+        Returns: {
+          access_level: string
+          has_video: boolean
+          id: string
+          is_public_preview: boolean
+          lesson_number: number
+          module_id: string
+          slug: string
+          summary: string
+          title: string
+          video_provider: string
+        }[]
+      }
     }
     Enums: {
       [_ in never]: never

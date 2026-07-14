@@ -1,1 +1,3 @@
-select slug, category, level, access_level, has_scaffold, has_sandbox from public.courses where published = true;
+set role anon;
+select id, title, access_level from public.lessons;
+reset role;
