@@ -1,3 +1,6 @@
+import type { UserTier } from "@/types";
+import type { AccessLevel } from "@/types/access";
+
 /**
  * Single source of truth for the primary marketing CTAs.
  *
@@ -53,3 +56,100 @@ export const PRICING_HREF = "/#pricing";
 export const HOME_SECTION_IDS = {
   pricing: "pricing",
 } as const;
+
+// ---------------------------------------------------------------------------
+// Course-page CTA logic (item 112)
+// ---------------------------------------------------------------------------
+
+/**
+ * The lesson route doesn't exist until item 120. Until then, "start this
+ * lesson" links have to land somewhere real. Building the href in one place
+ * means item 120 flips a single function, not every call site.
+ *
+ * FLIP AT ITEM 120: return `/lessons/${lessonSlug}`.
+ */
+export function lessonHref(lessonSlug: string): string {
+  // Interim: the lesson page isn't built, so anchor to the course's free
+  // preview intent via the catalog. lessonSlug is threaded through now so the
+  // flip at 120 is a one-liner.
+  void lessonSlug;
+  return CTA.freeLesson.href;
+}
+
+/**
+ * What the course-detail CTA should do, derived from the viewer's tier and the
+ * course's access level. This is INTENTIONALLY simple -- it is not an
+ * entitlement check (that's Phase 6). It only decides which CTA to show:
+ *
+ *   - free course            -> "Start free lesson"       (anyone)
+ *   - paid course, guest     -> "Sign up to unlock"       (-> signup)
+ *   - paid course, free user -> "Upgrade to unlock"       (-> upgrade/pricing)
+ *   - paid course, paid user -> "Start this course"       (treated as unlocked)
+ *
+ * The last case is optimistic on purpose: real per-course entitlement lands in
+ * Phase 6, and the lesson page itself (item 120) will do the authoritative
+ * server-side gate. Here we just avoid showing a paying subscriber an "upgrade"
+ * button.
+ */
+export type CourseCtaKind =
+  | "start_free"
+  | "signup_to_unlock"
+  | "upgrade_to_unlock"
+  | "start_paid";
+
+export interface CourseCta {
+  kind: CourseCtaKind;
+  label: string;
+  href: string;
+  /** Sub-label shown under the button; null when none is needed. */
+  hint: string | null;
+}
+
+interface CourseCtaInput {
+  courseAccessLevel: AccessLevel;
+  /** The viewer's tier, or null when signed out. */
+  tier: UserTier | null;
+  /** Slug of the course's first free lesson, if any. */
+  firstFreeLessonSlug: string | null;
+}
+
+export function getCourseCta({
+  courseAccessLevel,
+  tier,
+  firstFreeLessonSlug,
+}: CourseCtaInput): CourseCta {
+  const isFreeCourse = courseAccessLevel === "free";
+  const hasPaidAccess = tier === "paid" || tier === "enterprise";
+
+  // Free course, or a subscriber viewing paid content: go straight in.
+  if (isFreeCourse || hasPaidAccess) {
+    return {
+      kind: isFreeCourse ? "start_free" : "start_paid",
+      label: isFreeCourse ? "Start free lesson" : "Start this course",
+      href: firstFreeLessonSlug
+        ? lessonHref(firstFreeLessonSlug)
+        : CTA.browseCurriculum.href,
+      hint: isFreeCourse ? "No account required" : null,
+    };
+  }
+
+  // Paid course, signed out (no session at all): signup starts the funnel.
+  if (tier === null || tier === "visitor") {
+    return {
+      kind: "signup_to_unlock",
+      label: "Sign up to unlock",
+      href: CTA.foundingPass.href,
+      hint: firstFreeLessonSlug
+        ? "Or preview the free lesson below"
+        : "Free account, upgrade anytime",
+    };
+  }
+
+  // Paid course, signed-in free user: upgrade.
+  return {
+    kind: "upgrade_to_unlock",
+    label: "Upgrade to unlock",
+    href: CTA.foundingPass.href, // INTERIM -- see item 140 (-> /pricing or checkout)
+    hint: firstFreeLessonSlug ? "Or preview the free lesson below" : null,
+  };
+}

@@ -2,12 +2,14 @@ import { Code2 } from "lucide-react";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
+import { CourseCtaBlock } from "@/components/content/CourseCtaBlock";
 import { CourseModuleList } from "@/components/content/CourseModuleList";
 import { Container } from "@/components/layout/Container";
 import { Section } from "@/components/layout/Section";
 import { Badge } from "@/components/ui/badge";
 import { FormatBadge } from "@/components/ui/FormatBadge";
 import { LockedBadge } from "@/components/ui/LockedBadge";
+import { getCurrentUser, getUserTier } from "@/lib/auth";
 import { getCourseWithHierarchy } from "@/lib/db";
 import { cn } from "@/lib/utils";
 import type { CourseLevel, ValidationLabStatus } from "@/types/content";
@@ -79,6 +81,17 @@ export default async function CoursePage({ params }: CoursePageProps) {
   if (!course) {
     notFound();
   }
+
+  // Auth-aware CTA (item 112). This is NOT an entitlement check -- it only
+  // decides which CTA to show. The lesson page (item 120) does the real gate.
+  const user = await getCurrentUser();
+  const tier = user ? await getUserTier() : null;
+
+  // The first FREE lesson, in curriculum order, powers the preview/start CTA.
+  const firstFreeLessonSlug =
+    course.modules
+      .flatMap((module) => module.lessons)
+      .find((lesson) => lesson.access_level === "free")?.slug ?? null;
 
   const lab = LAB_STATUS[course.validation_lab_status];
   const lessonCount = course.modules.reduce(
@@ -160,7 +173,12 @@ export default async function CoursePage({ params }: CoursePageProps) {
             ) : null}
           </dl>
 
-          {/* CTA slot -- item 112 (Free Lesson 1 + subscription CTA). */}
+          {/* Auth-aware CTA (item 112). */}
+          <CourseCtaBlock
+            courseAccessLevel={course.access_level}
+            tier={tier}
+            firstFreeLessonSlug={firstFreeLessonSlug}
+          />
         </Container>
       </Section>
 
