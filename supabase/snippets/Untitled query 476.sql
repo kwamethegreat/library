@@ -1,3 +1,1 @@
-set role anon;
-select id, title, access_level from public.lessons;
-reset role;
+update public.courses set published = true where slug = 'intro-to-postgres';

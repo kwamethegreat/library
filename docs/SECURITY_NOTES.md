@@ -64,6 +64,7 @@ auth server), never `getSession()` (only reads the cookie and can be spoofed).
 ## 3. Auth flows
 
 ### Signup + email confirmation
+
 1. `/signup` → client validates with `signupSchema` → `signupAction` re-validates
    → `supabase.auth.signUp()` with `emailRedirectTo` pointing at
    `${APP_URL}/auth/confirm`.
@@ -82,6 +83,7 @@ auth server), never `getSession()` (only reads the cookie and can be spoofed).
    the session cookie. Then routes onward (see onboarding below).
 
 ### Login
+
 - `/login` → `loginAction` → `signInWithPassword`. Distinguishes
   `error.code === "email_not_confirmed"` (specific, helpful message) from all
   other failures (GENERIC "Invalid email or password" — see anti-enumeration §5).
@@ -89,11 +91,13 @@ auth server), never `getSession()` (only reads the cookie and can be spoofed).
   or `/dashboard`.
 
 ### Logout
+
 - `logoutAction` (`src/lib/auth/actions.ts`) → `signOut()` (clears cookies
   server-side) → redirect `/`. Wired into `Navigation` via a server-component form
   in `LogoutButton`.
 
 ### Password reset
+
 - `/reset-password` → `requestPasswordResetAction` → `resetPasswordForEmail` with
   `redirectTo` = `${APP_URL}/reset-password/update`.
 - Recovery email uses `supabase/templates/recovery.html`
@@ -106,6 +110,7 @@ auth server), never `getSession()` (only reads the cookie and can be spoofed).
   `updatePasswordAction` → `updateUser({ password })`.
 
 ### Onboarding routing
+
 - After confirmation, `/auth/confirm` calls `getPostAuthDestination()`
   (`src/lib/auth/onboarding.ts`): no `onboarding_lane` → `/onboarding`, else
   `/dashboard`. Recovery flows pass an explicit `next` which is honored instead.
@@ -164,7 +169,7 @@ Auth responses must never reveal whether a given email has an account. Decisions
   via `getRateLimitEnv()` (only the two `UPSTASH_*` vars — see §9). Sliding-window
   algorithm, lazy client/limiter creation, `analytics: false`.
 - `checkAuthRateLimit({ action, account, ipLimit, ipWindowMs, accountLimit,
-  accountWindowMs })` applies BOTH a per-IP and a per-account limit; fails if
+accountWindowMs })` applies BOTH a per-IP and a per-account limit; fails if
   either trips. Keys: `<action>:ip:<ip>` and `<action>:account:<email>`.
 - Current limits:
   - Login: 10 / 15 min per IP, 5 / 15 min per account.
@@ -205,15 +210,14 @@ entirely.
 ## 8. Service-role key: local-stack quirk (IMPORTANT)
 
 Supabase's new API keys (`sb_publishable_...` = anon, `sb_secret_...` =
-service_role) replace the legacy JWT keys (`eyJ...`). On the LOCAL CLI stack, the
-new `sb_secret_` key does NOT reliably resolve to the `service_role` Postgres role
-for PostgREST requests — the API gateway is supposed to substitute an internal
-`service_role` JWT for the `sb_secret_` key, and that substitution has been buggy
-on current CLI versions. Symptom: an admin client built with `sb_secret_` gets
-`permission denied` / apikey errors and does NOT bypass RLS, even though the key
+service*role) replace the legacy JWT keys (`eyJ...`). On the LOCAL CLI stack, the
+new `sb_secret*`key does NOT reliably resolve to the`service*role`Postgres role
+for PostgREST requests — the API gateway is supposed to substitute an internal`service_role`JWT for the`sb_secret*`key, and that substitution has been buggy
+on current CLI versions. Symptom: an admin client built with`sb*secret*`gets`permission denied` / apikey errors and does NOT bypass RLS, even though the key
 and grants are correct.
 
 Consequences / how we handle it:
+
 - **Profile self-heal** avoids the admin client entirely (uses the SECURITY
   DEFINER RPC — §7).
 - **`admin.ts` still exists** for future genuine service-role needs (Stripe/Mux
@@ -309,3 +313,5 @@ flag, and add a `code`-exchange branch to `/auth/confirm` (OAuth returns a PKCE
 ---
 
 _Last updated: end of Phase 3 (auth). Keep this current as auth changes._
+
+Item 113 — admin preview mode: deferred to Phase 12. Unpublished→404 and missing-modules empty states are done. Admin preview of unpublished courses/lessons will be built with the admin surface, via DB-gated SECURITY DEFINER admin RPCs (no service-role client, avoids the §8 quirk).

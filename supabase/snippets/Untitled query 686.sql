@@ -1,3 +1,2 @@
-set role anon;
-select slug, access_level, has_video from public.get_course_lesson_outline('aaaaaaaa-0000-0000-0000-000000000002');
-reset role;
+update public.modules set published = false
+   where course_id = 'aaaaaaaa-0000-0000-0000-000000000001';
