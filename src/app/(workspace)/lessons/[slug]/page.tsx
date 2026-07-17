@@ -2,13 +2,21 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
+import { LessonCodePane } from "@/components/workspace/LessonCodePane";
 import { LessonTheoryPane } from "@/components/workspace/LessonTheoryPane";
-import {
-  LessonWorkspace,
-  WorkspacePanePlaceholder,
-} from "@/components/workspace/LessonWorkspace";
+import { LessonWorkspace } from "@/components/workspace/LessonWorkspace";
 import { getLessonBySlug } from "@/lib/db";
 import type { VideoProvider } from "@/types/content";
+
+/**
+ * PLACEHOLDER sample code for the right-pane preview (item 116 uses hardcoded
+ * sample code by choice). Real content will come from the free code assets
+ * attached to the lesson (code_assets.code_body) in a later step. When that
+ * lands, delete this constant and pass the fetched asset instead.
+ */
+const SAMPLE_CODE = `export function Hello() {
+  return <h1>Hello, world</h1>;
+}`;
 
 interface LessonPageProps {
   params: Promise<{ slug: string }>;
@@ -82,9 +90,13 @@ export default async function LessonPage({ params }: LessonPageProps) {
         />
       }
       rightPane={
-        <WorkspacePanePlaceholder
-          label="RIGHT PANE / code"
-          hint="Code preview, copy button, and terminal output panel land here (item 116)."
+        <LessonCodePane
+          preview={{
+            filename: "hello.tsx",
+            language: "tsx",
+            isSample: true,
+            code: SAMPLE_CODE,
+          }}
         />
       }
     />
