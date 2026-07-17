@@ -34,17 +34,18 @@ values
 on conflict (id) do nothing;
 
 -- ===================== Lessons =====================
-insert into public.lessons (id, module_id, slug, title, lesson_number, summary, body_markdown, access_level, is_public_preview, published)
+insert into public.lessons (id, module_id, slug, title, lesson_number, summary, body_markdown, access_level, is_public_preview, published, video_provider, video_asset_id)
 values
-  -- The required FREE PUBLIC lesson (free access_level + public preview + published).
-  ('cccccccc-0000-0000-0000-000000000001', 'bbbbbbbb-0000-0000-0000-000000000001', 'what-is-react', 'What is React?', 1, 'A gentle introduction to React.', 'React is a library for building user interfaces from components.', 'free', true, true),
+  -- The required FREE PUBLIC lesson. Seeded with a public YouTube video so the
+  -- item 119 player is testable out of the box (video_provider='youtube').
+  ('cccccccc-0000-0000-0000-000000000001', 'bbbbbbbb-0000-0000-0000-000000000001', 'what-is-react', 'What is React?', 1, 'A gentle introduction to React.', 'React is a library for building user interfaces from components.', 'free', true, true, 'youtube', 'Tn6-PIqc4UM'),
   -- Free, published, not a preview.
-  ('cccccccc-0000-0000-0000-000000000002', 'bbbbbbbb-0000-0000-0000-000000000001', 'environment-setup', 'Setting Up Your Environment', 2, 'Install the tooling you need.', 'Install Node, then create your first app.', 'free', false, true),
+  ('cccccccc-0000-0000-0000-000000000002', 'bbbbbbbb-0000-0000-0000-000000000001', 'environment-setup', 'Setting Up Your Environment', 2, 'Install the tooling you need.', 'Install Node, then create your first app.', 'free', false, true, null, null),
   -- Paid, published. RLS must hide this row from anon/authenticated clients
   -- (they may still see its METADATA via get_course_lesson_outline()).
-  ('cccccccc-0000-0000-0000-000000000003', 'bbbbbbbb-0000-0000-0000-000000000003', 'memoization-deep-dive', 'Memoization Deep Dive', 1, 'useMemo and useCallback in depth.', 'Memoization avoids unnecessary recomputation.', 'paid', false, true),
+  ('cccccccc-0000-0000-0000-000000000003', 'bbbbbbbb-0000-0000-0000-000000000003', 'memoization-deep-dive', 'Memoization Deep Dive', 1, 'useMemo and useCallback in depth.', 'Memoization avoids unnecessary recomputation.', 'paid', false, true, null, null),
   -- Unpublished draft (should be hidden from anon entirely -- rows AND metadata).
-  ('cccccccc-0000-0000-0000-000000000004', 'bbbbbbbb-0000-0000-0000-000000000002', 'draft-lesson', 'Draft Lesson', 3, 'Work in progress.', 'This lesson is not published yet.', 'free', false, false)
+  ('cccccccc-0000-0000-0000-000000000004', 'bbbbbbbb-0000-0000-0000-000000000002', 'draft-lesson', 'Draft Lesson', 3, 'Work in progress.', 'This lesson is not published yet.', 'free', false, false, null, null)
 on conflict (id) do nothing;
 
 -- ===================== Code assets (the Code Vault) =====================

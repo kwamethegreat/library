@@ -1,0 +1,1 @@
+update public.lessons set video_asset_id = 'Tn6-PIqc4UM' where slug='what-is-react';

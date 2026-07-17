@@ -1,0 +1,1 @@
+update public.lessons set video_asset_id = 'not a valid id!!' where slug='what-is-react';

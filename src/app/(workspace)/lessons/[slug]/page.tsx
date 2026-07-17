@@ -5,6 +5,7 @@ import { notFound } from "next/navigation";
 import { Markdown } from "@/components/markdown/Markdown";
 import { LessonCodePane } from "@/components/workspace/LessonCodePane";
 import { LessonTheoryPane } from "@/components/workspace/LessonTheoryPane";
+import { LessonVideo } from "@/components/workspace/LessonVideo";
 import { LessonWorkspace } from "@/components/workspace/LessonWorkspace";
 import { getLessonBySlug } from "@/lib/db";
 import type { VideoProvider } from "@/types/content";
@@ -86,6 +87,14 @@ export default async function LessonPage({ params }: LessonPageProps) {
           lessonNumber={lesson.lesson_number}
           hasVideo={lesson.video_asset_id !== null}
           videoProvider={lesson.video_provider as VideoProvider | null}
+          video={
+            lesson.video_asset_id ? (
+              <LessonVideo
+                provider={lesson.video_provider as VideoProvider | null}
+                videoId={lesson.video_asset_id}
+              />
+            ) : undefined
+          }
           body={
             lesson.body_markdown ? (
               <Markdown content={lesson.body_markdown} />
