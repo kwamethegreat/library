@@ -31,7 +31,13 @@ export function LessonWorkspace({
   return (
     <div className={cn("flex min-h-[calc(100vh-4rem)] flex-col", className)}>
       {header ? (
-        <div className="border-b border-border bg-surface">{header}</div>
+        <div
+          role="region"
+          aria-label="Lesson navigation"
+          className="border-b border-border bg-surface"
+        >
+          {header}
+        </div>
       ) : null}
 
       <WorkspaceResponsive lesson={leftPane} code={rightPane} />

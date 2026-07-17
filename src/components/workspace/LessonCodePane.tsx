@@ -105,7 +105,10 @@ const SIMULATED_LINES = [
 
 function SimulatedTerminal() {
   return (
-    <div className="overflow-hidden rounded-xl border border-border">
+    <section
+      aria-label="Terminal output (simulated)"
+      className="overflow-hidden rounded-xl border border-border"
+    >
       {/* Terminal chrome */}
       <div className="flex items-center justify-between border-b border-border bg-surface px-4 py-2">
         <div className="flex items-center gap-2">
@@ -122,8 +125,20 @@ function SimulatedTerminal() {
         </span>
       </div>
 
-      {/* Static output */}
-      <div className="bg-background p-4 font-mono text-xs leading-relaxed">
+      {/*
+        Output is a live LOG region: `aria-live="polite"` so future streamed
+        output (real command output, once validation labs exist) is announced
+        to assistive tech without stealing focus; `role="log"` marks it as an
+        append-only sequence. Today the lines are static, but wiring the region
+        now means the terminal is accessible the moment it becomes dynamic.
+      */}
+      <div
+        role="log"
+        aria-live="polite"
+        aria-label="Command output"
+        aria-atomic="false"
+        className="bg-background p-4 font-mono text-xs leading-relaxed"
+      >
         {SIMULATED_LINES.map((line, index) => (
           <div key={index} className="flex gap-2">
             {line.prompt ? (
@@ -139,6 +154,6 @@ function SimulatedTerminal() {
           </div>
         ))}
       </div>
-    </div>
+    </section>
   );
 }

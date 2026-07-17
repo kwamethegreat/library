@@ -43,6 +43,7 @@ export function CopyButton({ value, label = "Copy", className }: CopyButtonProps
       aria-label={copied ? "Copied" : label}
       className={cn(
         "inline-flex items-center gap-1.5 rounded-md border border-border px-2 py-1 text-xs text-muted-foreground transition-colors hover:text-foreground",
+        "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring",
         className,
       )}
     >
@@ -52,6 +53,11 @@ export function CopyButton({ value, label = "Copy", className }: CopyButtonProps
         <Copy className="h-3.5 w-3.5" aria-hidden="true" />
       )}
       {copied ? "Copied" : label}
+      {/* Announce the copy result to assistive tech (the icon swap is visual
+          only). Off-screen live region, updated on copy. */}
+      <span className="sr-only" role="status" aria-live="polite">
+        {copied ? "Copied to clipboard" : ""}
+      </span>
     </button>
   );
 }
