@@ -2,11 +2,13 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
+import { LessonTheoryPane } from "@/components/workspace/LessonTheoryPane";
 import {
   LessonWorkspace,
   WorkspacePanePlaceholder,
 } from "@/components/workspace/LessonWorkspace";
 import { getLessonBySlug } from "@/lib/db";
+import type { VideoProvider } from "@/types/content";
 
 interface LessonPageProps {
   params: Promise<{ slug: string }>;
@@ -69,9 +71,14 @@ export default async function LessonPage({ params }: LessonPageProps) {
         </div>
       }
       leftPane={
-        <WorkspacePanePlaceholder
-          label="LEFT PANE / theory"
-          hint="Video player, markdown theory, and architecture notes land here (items 115, 118, 119)."
+        <LessonTheoryPane
+          title={lesson.title}
+          summary={lesson.summary}
+          lessonNumber={lesson.lesson_number}
+          hasVideo={lesson.video_asset_id !== null}
+          videoProvider={lesson.video_provider as VideoProvider | null}
+          // body slot -> item 118 (sanitized markdown of lessons.body_markdown)
+          // video slot -> item 119 (public player from video_asset_id)
         />
       }
       rightPane={
