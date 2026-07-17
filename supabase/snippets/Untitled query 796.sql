@@ -1,0 +1,1 @@
+select slug, body_markdown from public.lessons where slug = 'what-is-react';

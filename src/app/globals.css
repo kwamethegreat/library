@@ -242,3 +242,29 @@ pre code.hljs {
 .hljs-strong {
   font-weight: 600;
 }
+
+/* ==========================================================================
+   Workspace responsive panels (item 121)
+   --------------------------------------------------------------------------
+   Below lg the lesson workspace is a Lesson | Code tab switcher; at lg+ it is a
+   side-by-side split. We render each pane once and hide the inactive one with
+   the `hidden` attribute (our own markup -- NOT Base UI, so no `inert`).
+
+   Tailwind's Preflight hides any `[hidden]` element with a base-layer
+   `!important`, which utilities can't override. This one scoped rule re-shows
+   BOTH workspace panels at lg so the split can appear. Scoped to
+   `.workspace-panel` so no other hidden element in the app is affected.
+
+   APPEND to the END of src/app/globals.css.
+   ========================================================================== */
+
+@media (min-width: 64rem) {
+  /* 64rem = Tailwind's `lg` breakpoint (1024px). */
+  .workspace-panel[hidden] {
+    display: block !important;
+  }
+  /* Both panels sit in a flex row at lg; give them height to fill it. */
+  .workspace-panel {
+    min-height: calc(100vh - 8rem);
+  }
+}
