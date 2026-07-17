@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
+import { Markdown } from "@/components/markdown/Markdown";
 import { LessonCodePane } from "@/components/workspace/LessonCodePane";
 import { LessonTheoryPane } from "@/components/workspace/LessonTheoryPane";
 import { LessonWorkspace } from "@/components/workspace/LessonWorkspace";
@@ -85,7 +86,11 @@ export default async function LessonPage({ params }: LessonPageProps) {
           lessonNumber={lesson.lesson_number}
           hasVideo={lesson.video_asset_id !== null}
           videoProvider={lesson.video_provider as VideoProvider | null}
-          // body slot -> item 118 (sanitized markdown of lessons.body_markdown)
+          body={
+            lesson.body_markdown ? (
+              <Markdown content={lesson.body_markdown} />
+            ) : undefined
+          }
           // video slot -> item 119 (public player from video_asset_id)
         />
       }

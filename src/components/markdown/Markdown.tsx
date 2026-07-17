@@ -1,5 +1,6 @@
 import type { ComponentPropsWithoutRef } from "react";
 import ReactMarkdown from "react-markdown";
+import rehypeHighlight from "rehype-highlight";
 import rehypeSanitize from "rehype-sanitize";
 import remarkGfm from "remark-gfm";
 
@@ -15,19 +16,23 @@ interface MarkdownProps {
 type AnchorProps = ComponentPropsWithoutRef<"a">;
 
 /**
- * Renders trusted-source markdown SAFELY.
+ * Renders trusted-source markdown SAFELY, with syntax-highlighted code blocks.
  *
- * Pipeline: remark-gfm (tables, strikethrough, task lists, autolinks) ->
- * rehype-sanitize with our own allow-list schema (see markdown-schema.ts).
- * Sanitization runs on the HAST AFTER parsing, so anything not on the allow-list
- * is dropped -- this is the XSS boundary for author-authored lesson content.
+ * Pipeline (order matters):
+ *   remark-gfm         -> tables, strikethrough, task lists, autolinks
+ *   rehype-highlight   -> wraps code tokens in <span class="hljs-*"> (item 118)
+ *   rehype-sanitize    -> allow-list scrub of the FINAL tree (the XSS boundary)
  *
- * Syntax highlighting of fenced code is added in item 118 by inserting a rehype
- * highlighter BEFORE sanitize in the pipeline; the schema already permits the
- * highlighter's `language-*` / `hljs*` classes.
+ * highlight runs BEFORE sanitize on purpose: sanitize then validates the
+ * classes the highlighter emitted. Our schema (markdown-schema.ts) pre-allows
+ * `hljs*` / `language-*` classes, so the highlighting survives while anything
+ * off-list is still dropped. rehype-highlight is lowlight-based -- highlighting
+ * happens on the server at render time, shipping NO client JS and no CDN theme.
  *
- * A Server Component -- no client JS. Prose styling is applied via wrapper
- * classes rather than a plugin so we keep full control of the design tokens.
+ * The visual theme for the `hljs-*` classes is defined in globals.css using the
+ * app's design tokens (so code matches the dark theme).
+ *
+ * A Server Component -- no client JS.
  */
 export function Markdown({ content, className }: MarkdownProps) {
   return (
@@ -58,7 +63,11 @@ export function Markdown({ content, className }: MarkdownProps) {
     >
       <ReactMarkdown
         remarkPlugins={[remarkGfm]}
-        rehypePlugins={[[rehypeSanitize, lessonMarkdownSchema]]}
+        rehypePlugins={[
+          // Highlight first, then sanitize the result.
+          rehypeHighlight,
+          [rehypeSanitize, lessonMarkdownSchema],
+        ]}
         components={{
           // Harden links: external, no referrer/opener leakage. Sanitize has
           // already guaranteed href is a safe protocol.

@@ -171,3 +171,74 @@
     text-wrap: balance;
   }
 }
+
+/* ==========================================================================
+   Syntax highlighting theme (item 118)
+   --------------------------------------------------------------------------
+   Colors for the `hljs-*` classes emitted by rehype-highlight. Written against
+   the app's design tokens instead of importing a highlight.js stylesheet, so
+   code blocks match the dark theme rather than fighting it.
+
+   APPEND this block to the END of src/app/globals.css. It only styles token
+   spans inside `pre code.hljs`; the <pre>/<code> box styling comes from the
+   Markdown component's utility classes.
+   ========================================================================== */
+
+pre code.hljs {
+  color: var(--foreground);
+  background: transparent;
+}
+
+.hljs-comment,
+.hljs-quote {
+  color: var(--muted-foreground);
+  font-style: italic;
+}
+
+.hljs-keyword,
+.hljs-selector-tag,
+.hljs-built_in,
+.hljs-name,
+.hljs-tag {
+  color: var(--accent);
+}
+
+.hljs-string,
+.hljs-title,
+.hljs-section,
+.hljs-attribute,
+.hljs-literal,
+.hljs-template-tag,
+.hljs-template-variable,
+.hljs-type,
+.hljs-addition {
+  color: var(--success);
+}
+
+.hljs-number,
+.hljs-symbol,
+.hljs-bullet,
+.hljs-link,
+.hljs-meta,
+.hljs-selector-id,
+.hljs-selector-class {
+  color: var(--accent-foreground, var(--foreground));
+}
+
+.hljs-attr,
+.hljs-variable,
+.hljs-params {
+  color: var(--foreground);
+}
+
+.hljs-deletion {
+  color: var(--destructive, #ef4444);
+}
+
+.hljs-emphasis {
+  font-style: italic;
+}
+
+.hljs-strong {
+  font-weight: 600;
+}
