@@ -3,6 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import { Markdown } from "@/components/markdown/Markdown";
+import { MarkdownBoundary } from "@/components/markdown/MarkdownBoundary";
 import { LessonCodePane } from "@/components/workspace/LessonCodePane";
 import { LessonTheoryPane } from "@/components/workspace/LessonTheoryPane";
 import { LessonVideo } from "@/components/workspace/LessonVideo";
@@ -97,7 +98,9 @@ export default async function LessonPage({ params }: LessonPageProps) {
           }
           body={
             lesson.body_markdown ? (
-              <Markdown content={lesson.body_markdown} />
+              <MarkdownBoundary>
+                <Markdown content={lesson.body_markdown} />
+              </MarkdownBoundary>
             ) : undefined
           }
           // video slot -> item 119 (public player from video_asset_id)

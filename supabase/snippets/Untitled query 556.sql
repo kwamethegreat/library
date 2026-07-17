@@ -1,0 +1,1 @@
+update public.lessons set body_markdown = 'React is a library for building user interfaces from components.' where slug = 'what-is-react';
