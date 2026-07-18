@@ -56,6 +56,7 @@ export async function generateMetadata({
  * switching to the admin client.
  */
 export default async function LessonPage({ params }: LessonPageProps) {
+ // await new Promise((r) => setTimeout(r, 2000)); // TEMP — remove after checking
   const { slug } = await params;
   const lesson = await getLessonBySlug(slug);
 
