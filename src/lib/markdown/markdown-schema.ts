@@ -1,3 +1,4 @@
+import type { Options as SanitizeSchema } from "rehype-sanitize";
 import { defaultSchema } from "rehype-sanitize";
 
 /**
@@ -26,8 +27,16 @@ import { defaultSchema } from "rehype-sanitize";
  * If you are tempted to widen this schema, stop: every added tag/attribute is a
  * potential XSS vector against every lesson viewer. Prefer a remark/rehype
  * plugin that produces already-safe output over relaxing the allow-list.
+ *
+ * markdown-schema.test.ts locks this behaviour into CI -- both directions:
+ * injection stays blocked, AND the highlighter's classes keep working.
+ *
+ * NOTE: typed as SanitizeSchema (rehype-sanitize's own `Options`) rather than
+ * using `as const`. A deeply-readonly `as const` object is not assignable to
+ * the mutable Schema that unified's `.use()` expects, which breaks typecheck in
+ * the tests.
  */
-export const lessonMarkdownSchema = {
+export const lessonMarkdownSchema: SanitizeSchema = {
   ...defaultSchema,
   attributes: {
     ...defaultSchema.attributes,
@@ -36,4 +45,4 @@ export const lessonMarkdownSchema = {
     // Allow token spans from the highlighter, nothing else.
     span: [["className", /^hljs/]],
   },
-} as const;
+};

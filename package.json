@@ -55,10 +55,14 @@
     "eslint-import-resolver-typescript": "^4.4.5",
     "eslint-plugin-import": "^2.32.0",
     "prettier": "3.8.4",
+    "rehype-stringify": "^10.0.1",
+    "remark-parse": "^11.0.0",
+    "remark-rehype": "^11.1.2",
     "supabase": "^2.108.0",
     "tailwindcss": "^4",
     "typescript": "^5",
     "typescript-eslint": "^8.62.0",
+    "unified": "^11.0.5",
     "vitest": "^4.1.9"
   }
 }
