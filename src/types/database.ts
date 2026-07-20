@@ -576,6 +576,34 @@ export type Database = {
           video_provider: string
         }[]
       }
+      get_lesson_content: {
+        Args: { p_slug: string }
+        Returns: {
+          body_markdown: string
+          id: string
+          slug: string
+          video_asset_id: string
+          video_provider: string
+        }[]
+      }
+      get_lesson_meta: {
+        Args: { p_slug: string }
+        Returns: {
+          access_level: string
+          course_slug: string
+          course_title: string
+          has_video: boolean
+          id: string
+          is_public_preview: boolean
+          lesson_number: number
+          module_id: string
+          slug: string
+          summary: string
+          title: string
+          video_provider: string
+        }[]
+      }
+      has_active_subscription: { Args: never; Returns: boolean }
     }
     Enums: {
       [_ in never]: never
